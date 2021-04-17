@@ -2,9 +2,9 @@
 
 | Student's name | SCIPER |
 | -------------- | ------ |
-| | |
-| | |
-| | |
+| Adina-Maria Ciubotaru | 322497 |
+| Florian Cassayre | 269909 |
+| Utku Görkem Ertürk | 321977 |
 
 [Milestone 1](#milestone-1) • [Milestone 2](#milestone-2) • [Milestone 3](#milestone-3)
 
