@@ -23,6 +23,12 @@ Please, fill the following sections about your project.
 >
 > Hint: some good pointers for finding quality publicly available datasets ([Google dataset search](https://datasetsearch.research.google.com/), [Kaggle](https://www.kaggle.com/datasets), [OpenSwissData](https://opendata.swiss/en/), [SNAP](https://snap.stanford.edu/data/) and [FiveThirtyEight](https://data.fivethirtyeight.com/)), you could use also the DataSets proposed by the ENAC (see the Announcements section on Zulip).
 
+For our project we decided to work on the [arXiv dataset](https://www.kaggle.com/Cornell-University/arxiv).
+This dataset contains metadata of all the 1.7 million articles uploaded on arxiv.org since its creation.
+The metadata mainly consists of the following fields: title, abstract, authors list, categories, upload date and doi.
+From our exploratory data analysis work we concluded that the dataset was of great quality: for most use cases the data was ready to be used right away.
+For text analysis tasks, a standard tokenization pipeline shall be applied in order to filter our symbols and other non-textual notations.
+
 ### Problematic
 
 > Frame the general topic of your visualization and the main axis that you want to develop.
@@ -34,8 +40,11 @@ Please, fill the following sections about your project.
 > Pre-processing of the data set you chose
 > - Show some basic statistics and get insights about the data
 
-### Related work
+You may review the following notebook: [`exploratory_data_analysis.ipynb`](exploratory_data_analysis.ipynb).
 
+[TODO: list insights]
+
+### Related work
 
 > - What others have already done with the data?
 > - Why is your approach original?
