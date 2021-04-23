@@ -19,21 +19,13 @@ Please, fill the following sections about your project.
 
 ### Dataset
 
-> Find a dataset (or multiple) that you will explore. Assess the quality of the data it contains and how much preprocessing / data-cleaning it will require before tackling visualization. We recommend using a standard dataset as this course is not about scraping nor data processing.
->
-> Hint: some good pointers for finding quality publicly available datasets ([Google dataset search](https://datasetsearch.research.google.com/), [Kaggle](https://www.kaggle.com/datasets), [OpenSwissData](https://opendata.swiss/en/), [SNAP](https://snap.stanford.edu/data/) and [FiveThirtyEight](https://data.fivethirtyeight.com/)), you could use also the DataSets proposed by the ENAC (see the Announcements section on Zulip).
-
-For our project, we decided to work on the [arXiv dataset](https://www.kaggle.com/Cornell-University/arxiv). This dataset contains metadata of all the 1.7 million articles uploaded on arxiv.org since creation of arxiv.org. The metadata mainly consists of the following fields: title, abstract, authors list, categories, upload date and doi. From our exploratory data analysis work, we concluded that the dataset is of great quality: for most use cases the data is ready to be used right away. For text analysis tasks, a standard tokenization pipeline shall be applied in order to filter our symbols and other non-textual notations.
+For our project, we decided to work on the [arXiv dataset](https://www.kaggle.com/Cornell-University/arxiv). This dataset contains metadata of all the 1.7 million articles uploaded on arxiv.org. The metadata in this dataset consists mainly of the following fields: title, abstract, authors list, categories, upload date and doi. From our exploratory data analysis work, we concluded that the dataset is of great quality: for most use cases the data is ready to be used right away. For text analysis tasks, a standard tokenization pipeline shall be applied in order to filter our symbols and other non-textual notations.
 
 Remark: Anyone can publish articles on arXiv. For this project, we assume that most of the articles are serious, and thus that our analysis will be negligibly affected by nonsensical data. This information will be indicated in our final visualization.
 
 ### Problematic
 
-> Frame the general topic of your visualization and the main axis that you want to develop.
-> - What am I trying to show with my visualization?
-> - Think of an overview for the project, your motivation, and the target audience.
-
-For this project, we are interested in presenting an insightful analysis of the trends in academic publications. In particular, we will be providing an intuitive tool to explore the complex and immense dataset.
+In our project, we are interested in presenting an insightful analysis of the trends in academic publications. In particular, we will be providing an intuitive tool to explore the complex and immense space of scientific publications.
 
 We are aiming to target two audiences jointly:
 - One of them is the general public: the public doesn't always have a clear idea of how research works. With this project, we are hoping to provide them an engaging overview of the academical world, and a taste of how researchers collaborate together to create scientific results.
@@ -41,31 +33,23 @@ We are aiming to target two audiences jointly:
 
 ### Exploratory Data Analysis
 
-> Pre-processing of the data set you chose
-> - Show some basic statistics and get insights about the data
-
 Please refer to the following notebook: [`exploratory_data_analysis.ipynb`](exploratory_data_analysis.ipynb).
 
-Our preliminary analysis served different purposes. First off, it allowed us to assess the data, evaluate how much preprocessing work was required before we could get started. In our case, the data required very little preprocessing and we could get started right away. The second purpose was to validate the feasibility of our ideas; that is to verify that the data was rich enough, and that we could extract the patterns we wanted. 
+Our preliminary analysis served different purposes. First off, it allowed us to assess the data, evaluate how much preprocessing work was required before we could get started. In our case, the data required very little preprocessing, and we could get started right away. The second purpose was to validate the feasibility of our ideas; that is to verify that the data was rich enough, and that we could extract the patterns we wanted. 
 
-The analysis we conducted includes several interesting tracks of research. We started simply by studying global indicators such as the number of papers published over time, the preferred day of the week for publishing, number of categories, etc. Curiously, we observed that the characters length of both the title and the abstract was gradually and significantly increasing. Also it seems that the authors are collaborating in larger groups for a single paper.
+The analysis we conducted includes several interesting tracks of research. We started simply by studying global indicators such as the number of papers published over time, the preferred day of the week for publishing, number of categories, etc. Curiously, we observed that the character length of both the title and the abstract was gradually and significantly increasing. Also, it seems that the authors are collaborating in larger groups for a single paper.
 Unsurprisingly we also observed that the vocabulary and wording of the title and of the abstract were highly correlated to the category in which the paper was uploaded. Finally, we studied the transversality of the categories and made compelling observations.
 
-We also initially wanted to orient our analysis towards the EPFL research community (how researchers at EPFL collaborate together). However as our results were partly inconclusive, we decided to omit this direction from the final preliminary notebook.
+In addition we initially wanted to also orient our analysis towards the EPFL research community (how researchers at EPFL collaborate together). However as our results were partly inconclusive, we decided to discard it.
 
 ### Related work
-
-> - What others have already done with the data?
-> - Why is your approach original?
-> - What source of inspiration do you take? Visualizations that you found on other websites or magazines (might be unrelated to your data).
-> - In case you are using a dataset that you have already explored in another context (ML or ADA course, semester project...), you are required to share the report of that work to outline the differences with the submission for this class.
 
 This dataset was initially posted on Kaggle and intended to be used for machine learning purposes; main use cases include training text analysis models such as word2vec to find the similarities between papers, and topic classification.
 We found a relevant literature that studied scholar data, although the scope is different than ours; [A Survey of Scholarly Data Visualization](https://www.researchgate.net/publication/323715703_A_Survey_of_Scholarly_Data_Visualization). We couldn't find a major project that perform data analyses similar to the ones we performed. Thus we concluded that our approach was original.
 
 Our main source of inspiration for this project comes from our personal experience, and to a lesser extent from the data visualization stories showcased during the lectures.
 
-As an extra note, we did't use this dataset before.
+As an extra note, we didn't use this dataset before.
 
 ## Milestone 2 (7th May, 5pm)
 
