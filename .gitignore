@@ -2,3 +2,4 @@
 *.iml
 arxiv-metadata-oai-snapshot.json
 .ipynb_checkpoints
+.DS_Store
