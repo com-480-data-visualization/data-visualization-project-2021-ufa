@@ -75,18 +75,17 @@ Promise.all([
 
   const width = 1920;
   const height = 800;
-    
-    
-    const filterEdges = (data,minEdge) =>{
-      let links = data.links.filter(f => f.weight >= minEdge).map(d => Object.create(d));
-      let nodeSet = new Set();
-      links.forEach(item => {nodeSet.add(item.source);
-                             nodeSet.add(item.target);
-                            });
-      return {links: links, nodes: [...nodeSet].map(d => Object.create({id: d}))};
-    }
-  const filteredData = filterEdges(graph,100);
-      
+
+  const filterEdges = (data, minEdge) => {
+    let links = data.links.filter(f => f.weight >= minEdge).map(d => Object.create(d));
+    let nodeSet = new Set();
+    links.forEach(item => {
+      nodeSet.add(item.source);
+      nodeSet.add(item.target);
+    });
+    return { links: links, nodes: [...nodeSet].map(d => Object.create({ id: d })) };
+  };
+  const filteredData = filterEdges(graph, 100);
 
   const links = filteredData.links;
   const nodes = filteredData.nodes;
@@ -126,12 +125,12 @@ Promise.all([
     .attr('viewBox', [0, 0, width, height]);
 
   const link = svg.append('g')
-    .attr('stroke', '#d9d9d9')
-    //.attr('stroke-opacity', 0.6)
+    .attr('stroke', 'black')
+    .attr('stroke-opacity', 0.5)
     .selectAll('line')
     .data(links)
     .join('line')
-    .attr('stroke-width', d => 0.001 * d.weight);
+    .attr('stroke-width', d => 0.00025 * d.weight);
 
   const node = svg.append('g')
     .attr('stroke', '#fff')
