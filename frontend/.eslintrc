@@ -2,7 +2,8 @@
   "parser": "@babel/eslint-parser",
   "env": {
     "browser": true,
-    "node": true
+    "node": true,
+    "es6": true
   },
   "parserOptions": {
     "ecmaVersion": 6,
@@ -10,10 +11,19 @@
   },
   "rules": {
     "semi": "warn",
+    "indent": ["warn", 2],
     "quotes": [2, "single"],
     "constructor-super": "warn",
     "for-direction": "warn",
     "getter-return": "warn",
+    "comma-dangle": ["warn", {
+        "arrays": "always-multiline",
+        "objects": "always-multiline",
+        "imports": "always-multiline",
+        "exports": "always-multiline",
+        "functions": "never"
+    }],
+    "object-curly-spacing": ["warn", "always"],
     "no-async-promise-executor": "warn",
     "no-case-declarations": "warn",
     "no-class-assign": "warn",

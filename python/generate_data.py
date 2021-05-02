@@ -74,6 +74,16 @@ def compute_graph(df):
     return g
 
 
+def compute_categories_counts(df):
+    counts = {}
+    for categories in df.categories:
+        for category in categories.split(" "):
+            if category not in counts:
+                counts[category] = 0
+            counts[category] += 1
+    return counts
+
+
 def main():
     current_directory = os.path.dirname(os.path.abspath(__file__))
     path_input_file_arxiv = os.path.join(current_directory, input_file_arxiv)
@@ -82,16 +92,21 @@ def main():
     assert os.path.isfile(path_input_file_arxiv)
     assert os.path.isdir(path_output_directory)
 
+    def dump_json(filename, data):
+        with open(os.path.join(path_output_directory, filename), "w") as f:
+            json.dump(data, f, separators=(',', ':'))
+
     df = cached_or_compute(lambda: read_file_to_dataframe(path_input_file_arxiv, limit_max_lines),
                            "df.pkl", serialize_dataframe, deserialize_dataframe)
 
     g = cached_or_compute(lambda: compute_graph(df),
                           "categories_graph.pkl", serialize_network, deserialize_network)
 
-    # Generate graph
-    with open(os.path.join(path_output_directory, "categories_graph.json"), "w") as f:
-        print("Writing categories graph data...")
-        json.dump(nx.readwrite.json_graph.node_link_data(g), f)
+    print("Writing categories graph data...")
+    dump_json("categories_graph.json", nx.readwrite.json_graph.node_link_data(g))
+
+    print("Writing categories counts...")
+    dump_json("categories_counts.json", compute_categories_counts(df))
 
     print("All done.")
 
