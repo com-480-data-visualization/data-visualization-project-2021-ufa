@@ -77,14 +77,14 @@ Promise.all([
   const height = 800;
     
     
-    const filterEdges = (data,minEdge) =>{
-      let links = data.links.filter(f => f.weight >= minEdge).map(d => Object.create(d));
-      let nodeSet = new Set();
-      links.forEach(item => {nodeSet.add(item.source);
-                             nodeSet.add(item.target);
-                            });
-      return {links: links, nodes: [...nodeSet].map(d => Object.create({id: d}))};
-    }
+  const filterEdges = (data,minEdge) =>{
+    let links = data.links.filter(f => f.weight >= minEdge).map(d => Object.create(d));
+    let nodeSet = new Set();
+    links.forEach(item => {nodeSet.add(item.source);
+                           nodeSet.add(item.target);
+                          });
+    return {links: links, nodes: [...nodeSet].map(d => Object.create({id: d}))};
+  }
   const filteredData = filterEdges(graph,100);
       
 
@@ -165,5 +165,27 @@ Promise.all([
   });
 
   d3.select('body').node().append(svg.node());
+  
+  node.on("mouseover", function(_,d) {    
+    var thisNode = d.id
+    var connected = links.filter(function(e) {
+        return e.source.id === thisNode || e.target.id === thisNode;
+    });
+    
+    node.attr("opacity", function(d) {
+        return (connected.map(d => d.source.id).indexOf(d.id) > -1 || connected.map(d => d.target.id).indexOf(d.id) > -1) ? 1 : 0.1;
+    });
+
+    link.attr("opacity", function(d) {
+        return (d.source.id == thisNode || d.target.id == thisNode) ? 1 : 0.1;
+    }).attr('stroke', d=>{return (d.source.id == thisNode || d.target.id == thisNode) ? "black" : '#d9d9d9';});
+
+  })
+  .on('mouseout', function (_,d) {
+        node.attr('opacity', '1');
+        link
+          .attr('opacity', '1')
+          .attr('stroke', '#d9d9d9');
+      })
   //invalidation.then(() => simulation.stop());
 });
