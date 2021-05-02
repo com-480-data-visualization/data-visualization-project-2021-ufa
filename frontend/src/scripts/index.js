@@ -1,8 +1,8 @@
 import '../styles/index.scss';
 import 'tailwindcss/tailwind.css';
+import '@fontsource/poppins';
 import * as d3 from 'd3';
-// eslint-disable-next-line no-unused-vars
-import * as THREE from 'three';
+// import * as THREE from 'three';
 
 if (process.env.NODE_ENV === 'development') { // Do not remove: used for hot reload
   require('../index.html');
@@ -45,9 +45,11 @@ const categories = [
     label: 'Economics',
     keywords: ['q-fin'],
   },
-];
-
-const defaultLabel = 'Other';
+  {
+    label: 'Other',
+    keywords: null,
+  },
+].map((obj, idx) => ({ ...obj, index: idx }));
 
 const fetchJson = filename => fetch(`public/data/${filename}`).then(response => response.json());
 
@@ -59,33 +61,38 @@ Promise.all([
   const getCategoryIndexAndLabel = name => {
     for (let i = 0; i < categories.length; i++) {
       const category = categories[i];
+      if (category.keywords === null) {
+        return { index: i, label: category.label };
+      }
       for (let j = 0; j < category.keywords.length; j++) {
         if (name.includes(category.keywords[j])) {
           return { index: i, label: category.label };
         }
       }
     }
-    return { index: categories.length, label: defaultLabel };
   };
+
+  const categoriesColors = d3.schemeCategory10;
 
   const color = d => {
     const { index } = getCategoryIndexAndLabel(d.id);
-    return d3.schemeCategory10[index];
+    return categoriesColors[index];
   };
 
-  const width = 1920;
-  const height = 800;
- 
-  const filterEdges = (data,minEdge) =>{
+  const width = 1000;
+  const height = 1000;
+
+  const filterEdges = (data, minEdge) => {
     let links = data.links.filter(f => f.weight >= minEdge).map(d => Object.create(d));
     let nodeSet = new Set();
-    links.forEach(item => {nodeSet.add(item.source);
-                           nodeSet.add(item.target);
-                          });
-    return {links: links, nodes: [...nodeSet].map(d => Object.create({id: d}))};
-  }
-  const filteredData = filterEdges(graph,100);
-      
+    links.forEach(item => {
+      nodeSet.add(item.source);
+      nodeSet.add(item.target);
+    });
+    return { links: links, nodes: [...nodeSet].map(d => Object.create({ id: d })) };
+  };
+  const filteredData = filterEdges(graph, 100);
+
   const links = filteredData.links;
   const nodes = filteredData.nodes;
 
@@ -120,8 +127,19 @@ Promise.all([
   };
 
   const svg = d3.create('svg')
-    .attr('width', width).attr('height', height)
+    //.attr('width', width).attr('height', height)
     .attr('viewBox', [0, 0, width, height]);
+
+  const clusters = svg.append('g')
+    .attr('font-weight', 'bold')
+    .style('cursor', 'default')
+    .style('user-select', 'none')
+    .attr('text-anchor', 'middle')
+    .selectAll('text')
+    .data(categories)
+    .join('text')
+    .attr('fill', d => categoriesColors[d.index])
+    .text(d => d.label);
 
   const link = svg.append('g')
     .attr('stroke', 'black')
@@ -134,6 +152,7 @@ Promise.all([
   const node = svg.append('g')
     .attr('stroke', '#fff')
     .attr('stroke-width', 1.5)
+    .style('cursor', 'pointer')
     .selectAll('circle')
     .data(nodes)
     .join('circle')
@@ -160,30 +179,46 @@ Promise.all([
     node
       .attr('cx', d => clampX(Math.max(0, Math.min(width, d.x))))
       .attr('cy', d => clampY(Math.max(0, Math.min(height, d.y))));
+
+    const groups = {};
+    nodes.forEach(node => {
+      const index = getCategoryIndexAndLabel(node.id).index;
+      if (!groups[index]) {
+        groups[index] = [];
+      }
+      groups[index].push(node);
+    });
+    const mean = nodes => {
+      const xs = nodes.map(d => d.x).reduce((a, b) => a + b);
+      const ys = nodes.map(d => d.y).reduce((a, b) => a + b);
+      return { x: xs / nodes.length, y: ys / nodes.length - 10 };
+    };
+    const aggregated = Object.fromEntries(Object.entries(groups).map(([index, nodesIn]) => [index, mean(nodesIn)]));
+    clusters
+      .attr('x', d => aggregated[d.index].x)
+      .attr('y', d => aggregated[d.index].y);
   });
 
-  d3.select('body').node().append(svg.node());
-  
-  node.on("mouseover", function(_,d) {    
-    var thisNode = d.id
-    var connected = links.filter(function(e) {
-        return e.source.id === thisNode || e.target.id === thisNode;
-    });
-    
-    node.attr("opacity", function(d) {
-        return (connected.map(d => d.source.id).indexOf(d.id) > -1 || connected.map(d => d.target.id).indexOf(d.id) > -1) ? 1 : 0.1;
+  node.on('mouseover', function (_, d) {
+    const thisNode = d.id;
+    const connected = links.filter(function (e) {
+      return e.source.id === thisNode || e.target.id === thisNode;
     });
 
-    link.attr("opacity", function(d) {
-        return (d.source.id == thisNode || d.target.id == thisNode) ? 1 : 0.1;
-    }).attr('stroke', d=>{return (d.source.id == thisNode || d.target.id == thisNode) ? "black" : '#d9d9d9';});
+    node.attr('opacity', function (d) {
+      return (connected.map(d => d.source.id).indexOf(d.id) > -1 || connected.map(d => d.target.id).indexOf(d.id) > -1) ? 1 : 0.1;
+    });
+
+    link.attr('opacity', function (d) {
+      return (d.source.id === thisNode || d.target.id === thisNode) ? 1 : 0.1;
+    });
 
   })
-  .on('mouseout', function (_,d) {
-        node.attr('opacity', '1');
-        link
-          .attr('opacity', '1')
-          .attr('stroke', '#d9d9d9');
-      })
+    .on('mouseout', (e, d) => {
+      node.attr('opacity', 1);
+      link.attr('opacity', 1);
+    });
+
+  d3.select('#categories-graph').node().append(svg.node());
   //invalidation.then(() => simulation.stop());
 });
