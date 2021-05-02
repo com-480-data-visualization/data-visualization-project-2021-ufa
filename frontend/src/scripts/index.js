@@ -69,15 +69,27 @@ Promise.all([
   };
 
   const color = d => {
-    const { index } = getCategoryIndexAndLabel(graph.nodes[d.index].id);
+    const { index } = getCategoryIndexAndLabel(d.id);
     return d3.schemeCategory10[index];
   };
 
   const width = 1920;
   const height = 800;
+    
+    
+    const filterEdges = (data,minEdge) =>{
+      let links = data.links.filter(f => f.weight >= minEdge).map(d => Object.create(d));
+      let nodeSet = new Set();
+      links.forEach(item => {nodeSet.add(item.source);
+                             nodeSet.add(item.target);
+                            });
+      return {links: links, nodes: [...nodeSet].map(d => Object.create({id: d}))};
+    }
+  const filteredData = filterEdges(graph,100);
+      
 
-  const links = graph.links.filter(f => f.weight >= 100).map(d => Object.create(d));
-  const nodes = graph.nodes.map(d => Object.create(d));
+  const links = filteredData.links;
+  const nodes = filteredData.nodes;
 
   const simulation = d3.forceSimulation(nodes)
     .force('link', d3.forceLink(links).id(d => d.id))
