@@ -53,6 +53,69 @@ const categories = [
 
 const fetchJson = filename => fetch(`public/data/${filename}`).then(response => response.json());
 
+// set the dimensions and margins of the bar plot
+let margin = { top: 10, right: 30, bottom: 90, left: 40 },
+  width_bar = 360 - margin.left - margin.right,
+  height_bar = 350 - margin.top - margin.bottom;
+
+//Category Similarity Bar
+
+function bar_plot(dataBar){
+  
+  
+  d3.select('#similar-bar').select('svg').remove();
+
+  // append the svg object to the body of the page
+
+  let svg_bar = d3.select('#similar-bar')
+    .append('svg')
+    .attr('width', width_bar + margin.left + margin.right)
+    .attr('height', height_bar + margin.top + margin.bottom)
+    .append('g')
+    .attr('transform',
+      'translate(' + margin.left + ',' + margin.top + ')');
+  // X axis
+  let x = d3.scaleBand()
+    .range([ 0, width_bar ])
+    .domain(dataBar.map(function(d) { return d.id; }))
+    .padding(0.2);
+  svg_bar.append('g')
+    .attr('transform', 'translate(0,' + height_bar + ')')
+    .call(d3.axisBottom(x))
+    .selectAll('text')
+    .attr('transform', 'translate(-10,0)rotate(-45)')
+    .style('text-anchor', 'end');
+
+  // Add Y axis
+  let y = d3.scaleLinear()
+    .domain([0, 100])
+    .range([ height_bar, 0]);
+  svg_bar.append('g')
+    .call(d3.axisLeft(y));
+
+  // Bars
+  svg_bar.selectAll('mybar')
+    .data(dataBar)
+    .enter()
+    .append('rect')
+    .attr('x', function(d) { return x(d.id); })
+    .attr('width', x.bandwidth())
+    .attr('fill', '#69b3a2')
+  // no bar at the beginning thus:
+    .attr('height', ()=> height_bar - y(0)) // always equal to 0
+    .attr('y', ()=>  y(0));
+
+  // Animation
+  svg_bar.selectAll('rect')
+    .transition()
+    .duration(800)
+    .attr('y', function(d) { return y(d.weightPercentage); })
+    .attr('height', function(d) { return height_bar - y(d.weightPercentage); })
+    .delay(function(d,i){return(i*100);});
+
+}
+
+
 Promise.all([
   fetchJson('categories_graph.json'),
   fetchJson('categories_counts.json'),
@@ -212,9 +275,22 @@ Promise.all([
     link.attr('opacity', function (d) {
       return (d.source.id === thisNode || d.target.id === thisNode) ? 1 : 0.1;
     });
-
+    let weightSum = d3.sum(connected,d=>d.weight);
+    let neighbourData = connected.map(e =>{
+      let neighbourNode = '';
+      if (e.source.id === thisNode){
+        neighbourNode = e.target.id;
+      } else {
+        neighbourNode = e.source.id;
+      }
+      return { id:neighbourNode,weightPercentage:e.weight*100/weightSum };
+    }).sort(function(x, y){
+      return d3.descending(x.weightPercentage, y.weightPercentage);
+    });
+    
+    bar_plot(neighbourData);
   })
-    .on('mouseout', (e, d) => {
+    .on('mouseout', () => {
       node.attr('opacity', 1);
       link.attr('opacity', 1);
     });
