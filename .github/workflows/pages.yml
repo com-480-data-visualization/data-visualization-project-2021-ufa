@@ -18,6 +18,7 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@4.1.1
         with:
           branch: gh-pages
+          single-commit: true
           folder: ./frontend/build
           git-config-name: github-actions
           git-config-email: 41898282+github-actions[bot]@users.noreply.github.com

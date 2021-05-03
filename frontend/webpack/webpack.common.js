@@ -41,7 +41,9 @@ module.exports = {
         use: {
           loader: 'file-loader',
           options: {
-            name: '[path][name].[ext]',
+            // Beware, we are currently discarding the path because of issue with fontsource
+            // If needed this can be converted to a more specific rule
+            name: '[name].[ext]',
           },
         },
       },
