@@ -51,12 +51,36 @@ const categories = [
   },
 ].map((obj, idx) => ({ ...obj, index: idx }));
 
+const SIMILARITY_BAR_N = 5;
+
 const fetchJson = filename => fetch(`public/data/${filename}`).then(response => response.json());
 
 // Set the dimensions and margins of the bar plot
 let margin = { top: 10, right: 30, bottom: 90, left: 40 },
   widthBar = 360 - margin.left - margin.right,
   heightBar = 350 - margin.top - margin.bottom;
+
+
+const getCategoryIndexAndLabel = name => {
+  for (let i = 0; i < categories.length; i++) {
+    const category = categories[i];
+    if (category.keywords === null) {
+      return { index: i, label: category.label };
+    }
+    for (let j = 0; j < category.keywords.length; j++) {
+      if (name.includes(category.keywords[j])) {
+        return { index: i, label: category.label };
+      }
+    }
+  }
+};
+
+const categoriesColors = d3.schemeCategory10;
+
+const color = d => {
+  const { index } = getCategoryIndexAndLabel(d.id);
+  return categoriesColors[index];
+};
 
 // Category Similarity Bar
 
@@ -97,7 +121,7 @@ function barPlot(dataBar){
     .append('rect')
     .attr('x', function(d) { return x(d.id); })
     .attr('width', x.bandwidth())
-    .attr('fill', '#69b3a2')
+    .attr('fill', color)
   // no bar at the beginning thus:
     .attr('height', ()=> heightBar - y(0)) // always equal to 0
     .attr('y', ()=>  y(0));
@@ -107,10 +131,10 @@ function barPlot(dataBar){
   // Animation
   svg_bar.selectAll('rect')
     .transition()
-    .duration(800)
+    .duration(200)
     .attr('y', function(d) { return y(d.weightRatio * hundred); })
     .attr('height', function(d) { return heightBar - y(d.weightRatio * hundred); })
-    .delay(function(d,i){return(i*100);});
+    .delay(function(d,i){return(i*50);});
 
 }
 
@@ -119,27 +143,6 @@ Promise.all([
   fetchJson('categories_graph.json'),
   fetchJson('categories_counts.json'),
 ]).then(([graph, categoriesCounts]) => {
-
-  const getCategoryIndexAndLabel = name => {
-    for (let i = 0; i < categories.length; i++) {
-      const category = categories[i];
-      if (category.keywords === null) {
-        return { index: i, label: category.label };
-      }
-      for (let j = 0; j < category.keywords.length; j++) {
-        if (name.includes(category.keywords[j])) {
-          return { index: i, label: category.label };
-        }
-      }
-    }
-  };
-
-  const categoriesColors = d3.schemeCategory10;
-
-  const color = d => {
-    const { index } = getCategoryIndexAndLabel(d.id);
-    return categoriesColors[index];
-  };
 
   const width = 1000;
   const height = 800;
@@ -188,7 +191,8 @@ Promise.all([
     const weightSum = connectedWeights.map(({ weight }) => weight).reduce((a, b) => a + b, 0);
     const connectedWeightRatios = connectedWeights
       .map(obj => ({ ...obj, weightRatio: obj.weight / weightSum }))
-      .sort((x, y) => d3.descending(x.weightRatio, y.weightRatio));
+      .sort((x, y) => d3.descending(x.weightRatio, y.weightRatio))
+      .slice(0, SIMILARITY_BAR_N);
 
     gNodes.classed('opacity-10', node ? d => !connectedSet.has(d.id) : false);
     gLinks.classed('opacity-25', node ? d => d.source.id !== node.id && d.target.id !== node.id : false);
