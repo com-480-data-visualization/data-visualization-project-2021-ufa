@@ -1,8 +1,8 @@
 import '../styles/index.scss';
 import 'tailwindcss/tailwind.css';
 import '@fontsource/poppins';
+//import * as THREE from 'three';
 import * as d3 from 'd3';
-// import * as THREE from 'three';
 
 if (process.env.NODE_ENV === 'development') { // Do not remove: used for hot reload
   require('../index.html');
@@ -83,11 +83,11 @@ const color = d => {
 
 // Category Similarity Bar
 
-function barPlot(dataBar){
+function barPlot(dataBar) {
 
   d3.select('#similar-bar').select('svg').remove();
 
-  let svg_bar = d3.select('#similar-bar')
+  let svgBar = d3.select('#similar-bar')
     .append('svg')
     .attr('width', widthChart + margin.left + margin.right)
     .attr('height', heightChart + margin.top + margin.bottom)
@@ -96,10 +96,10 @@ function barPlot(dataBar){
       'translate(' + margin.left + ',' + margin.top + ')');
   // X axis
   let x = d3.scaleBand()
-    .range([ 0, widthChart ])
-    .domain(dataBar.map(function(d) { return d.id; }))
+    .range([0, widthChart])
+    .domain(dataBar.map(d => d.id))
     .padding(0.2);
-  svg_bar.append('g')
+  svgBar.append('g')
     .attr('transform', 'translate(0,' + heightChart + ')')
     .call(d3.axisBottom(x))
     .selectAll('text')
@@ -109,35 +109,35 @@ function barPlot(dataBar){
   // Add Y axis
   let y = d3.scaleLinear()
     .domain([0, 100])
-    .range([ heightChart, 0]);
-  svg_bar.append('g')
+    .range([heightChart, 0]);
+  svgBar.append('g')
     .call(d3.axisLeft(y));
 
   // Bars
-  svg_bar.selectAll('mybar')
+  svgBar.selectAll('mybar')
     .data(dataBar)
     .enter()
     .append('rect')
-    .attr('x', function(d) { return x(d.id); })
+    .attr('x', d => x(d.id))
     .attr('width', x.bandwidth())
     .attr('fill', color)
   // no bar at the beginning thus:
-    .attr('height', ()=> heightChart - y(0)) // always equal to 0
-    .attr('y', ()=>  y(0));
+    .attr('height', () => heightChart - y(0)) // always equal to 0
+    .attr('y', () =>  y(0));
 
   const hundred = 100;
 
   // Animation
-  svg_bar.selectAll('rect')
+  svgBar.selectAll('rect')
     .transition()
     .duration(200)
-    .attr('y', function(d) { return y(d.weightRatio * hundred); })
-    .attr('height', function(d) { return heightChart - y(d.weightRatio * hundred); })
-    .delay(function(d,i){return(i*50);});
+    .attr('y', d => y(d.weightRatio * hundred))
+    .attr('height', d => heightChart - y(d.weightRatio * hundred))
+    .delay((d, i) => (i * 50));
 
 }
 
-function linePlot(dataLine, lineColor){
+function linePlot(dataLine, lineColor) {
 
   d3.select('#published-line').select('svg').remove();
 
@@ -163,25 +163,25 @@ function linePlot(dataLine, lineColor){
 
 
   let y = d3.scaleLinear()
-    .domain([0, d3.max(dataLine, d=> d.value)]).nice()
+    .domain([0, d3.max(dataLine, d => d.value)]).nice()
     .range([heightChart, margin.top]);
 
   let x = d3.scaleTime()
     .domain(d3.extent(dataLine, d => d.date))
-    .range([margin.left, widthChart+ margin.left]);
+    .range([margin.left, widthChart + margin.left]);
 
 
   const svg = d3.select('#published-line')
     .append('svg')
     .attr('width', widthChart + margin.left + margin.right)
     .attr('height', heightChart + margin.top + margin.bottom);
-  
+
   svg.append('g')
     .call(xAxis);
 
   svg.append('g')
     .call(yAxis);
-  
+
   let path = svg.append('path')
     .datum(dataLine)
     .attr('fill', 'none')
@@ -233,7 +233,7 @@ Promise.all([
   let hoveredNode = null;
 
   const updateHighlights = () => {
-    
+
     const node = selectedNode || hoveredNode;
     const connectedSet = new Set();
     const connectedWeights = [];
@@ -247,16 +247,16 @@ Promise.all([
         } else if (l.target.id === node.id) {
           neighbour = l.source.id;
         }
-        if(neighbour) {
+        if (neighbour) {
           connectedSet.add(neighbour);
           connectedWeights.push({ id: neighbour, weight: l.weight });
         }
       });
 
       //Line data(MOCK)
-      const items = [0,10,40,50,80,99.47];
-      const date = [[2007,3,23],[2007,3,24],[2007,3,25],[2007,3,26],[2007,3,29],[2007,4,1]];
-      items.forEach((item,i) => (dataLine.push({ date: new Date(date[i][0], date[i][1], date[i][2]), value: item })));
+      const items = [0, 10, 40, 50, 80, 99.47];
+      const date = [[2007, 3, 23], [2007, 3, 24], [2007, 3, 25], [2007, 3, 26], [2007, 3, 29], [2007, 4, 1]];
+      items.forEach((item, i) => (dataLine.push({ date: new Date(date[i][0], date[i][1], date[i][2]), value: item })));
 
     }
     const weightSum = connectedWeights.map(({ weight }) => weight).reduce((a, b) => a + b, 0);
@@ -272,7 +272,7 @@ Promise.all([
     d3.select('#categories-selected-count').text(node ? categoriesCounts[node.id].toLocaleString() : '-');
 
     barPlot(connectedWeightRatios);
-    linePlot(dataLine,node?color(node):'');
+    linePlot(dataLine, node ? color(node) : '');
   };
 
   const drag = simulation => {
@@ -308,7 +308,7 @@ Promise.all([
 
   const svg = d3.create('svg')
     //.attr('width', width).attr('height', height)
-    .attr('viewBox', [0, 0, width, height]);
+    .attr('viewBox', [0, 0, width, height].join(' '));
 
   const gClusters = svg.append('g')
     .attr('font-weight', 'bold')
@@ -385,13 +385,13 @@ Promise.all([
   gNodes
     .on('mouseover', (_, d) => {
       hoveredNode = d;
-      if(!selectedNode) { // Avoid expensive updates
+      if (!selectedNode) { // Avoid expensive updates
         updateHighlights();
       }
     })
     .on('mouseout', () => {
       hoveredNode = null;
-      if(!selectedNode) {
+      if (!selectedNode) {
         updateHighlights();
       }
     });
