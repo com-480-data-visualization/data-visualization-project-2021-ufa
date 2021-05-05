@@ -1,8 +1,8 @@
 import '../styles/index.scss';
 import 'tailwindcss/tailwind.css';
 import '@fontsource/poppins';
+//import * as THREE from 'three';
 import * as d3 from 'd3';
-// import * as THREE from 'three';
 
 if (process.env.NODE_ENV === 'development') { // Do not remove: used for hot reload
   require('../index.html');
@@ -84,11 +84,11 @@ const color = d => {
 
 // Category Similarity Bar
 
-function barPlot(dataBar){
+function barPlot(dataBar) {
 
   d3.select('#similar-bar').select('svg').remove();
 
-  let svg_bar = d3.select('#similar-bar')
+  let svgBar = d3.select('#similar-bar')
     .append('svg')
     .attr('width', widthBar + margin.left + margin.right)
     .attr('height', heightBar + margin.top + margin.bottom)
@@ -97,10 +97,10 @@ function barPlot(dataBar){
       'translate(' + margin.left + ',' + margin.top + ')');
   // X axis
   let x = d3.scaleBand()
-    .range([ 0, widthBar ])
-    .domain(dataBar.map(function(d) { return d.id; }))
+    .range([0, widthBar])
+    .domain(dataBar.map(d => d.id))
     .padding(0.2);
-  svg_bar.append('g')
+  svgBar.append('g')
     .attr('transform', 'translate(0,' + heightBar + ')')
     .call(d3.axisBottom(x))
     .selectAll('text')
@@ -110,31 +110,31 @@ function barPlot(dataBar){
   // Add Y axis
   let y = d3.scaleLinear()
     .domain([0, 100])
-    .range([ heightBar, 0]);
-  svg_bar.append('g')
+    .range([heightBar, 0]);
+  svgBar.append('g')
     .call(d3.axisLeft(y));
 
   // Bars
-  svg_bar.selectAll('mybar')
+  svgBar.selectAll('mybar')
     .data(dataBar)
     .enter()
     .append('rect')
-    .attr('x', function(d) { return x(d.id); })
+    .attr('x', d => x(d.id))
     .attr('width', x.bandwidth())
     .attr('fill', color)
   // no bar at the beginning thus:
-    .attr('height', ()=> heightBar - y(0)) // always equal to 0
-    .attr('y', ()=>  y(0));
+    .attr('height', () => heightBar - y(0)) // always equal to 0
+    .attr('y', () =>  y(0));
 
   const hundred = 100;
 
   // Animation
-  svg_bar.selectAll('rect')
+  svgBar.selectAll('rect')
     .transition()
     .duration(200)
-    .attr('y', function(d) { return y(d.weightRatio * hundred); })
-    .attr('height', function(d) { return heightBar - y(d.weightRatio * hundred); })
-    .delay(function(d,i){return(i*50);});
+    .attr('y', d => y(d.weightRatio * hundred))
+    .attr('height', d => heightBar - y(d.weightRatio * hundred))
+    .delay((d, i) => (i * 50));
 
 }
 
@@ -182,7 +182,7 @@ Promise.all([
         } else if (l.target.id === node.id) {
           neighbour = l.source.id;
         }
-        if(neighbour) {
+        if (neighbour) {
           connectedSet.add(neighbour);
           connectedWeights.push({ id: neighbour, weight: l.weight });
         }
@@ -236,7 +236,7 @@ Promise.all([
 
   const svg = d3.create('svg')
     //.attr('width', width).attr('height', height)
-    .attr('viewBox', [0, 0, width, height]);
+    .attr('viewBox', [0, 0, width, height].join(' '));
 
   const gClusters = svg.append('g')
     .attr('font-weight', 'bold')
@@ -313,13 +313,13 @@ Promise.all([
   gNodes
     .on('mouseover', (_, d) => {
       hoveredNode = d;
-      if(!selectedNode) { // Avoid expensive updates
+      if (!selectedNode) { // Avoid expensive updates
         updateHighlights();
       }
     })
     .on('mouseout', () => {
       hoveredNode = null;
-      if(!selectedNode) {
+      if (!selectedNode) {
         updateHighlights();
       }
     });
