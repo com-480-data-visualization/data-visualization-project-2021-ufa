@@ -2,8 +2,14 @@ import json
 import os
 
 import networkx as nx
+import numpy as np
 import pandas as pd
 
+from sklearn.decomposition import TruncatedSVD, PCA
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+
+# Download dataset from Kaggle (registration required): https://www.kaggle.com/Cornell-University/arxiv/download
 input_file_arxiv = "../arxiv-metadata-oai-snapshot.json"
 output_directory = "../frontend/public/data/"
 
@@ -40,6 +46,14 @@ def serialize_network(filename, network):
 
 def deserialize_network(filename):
     return nx.read_gpickle(filename)
+
+
+def serialize_numpy(filename, array):
+    np.save(filename, array)
+
+
+def deserialize_numpy(filename):
+    return np.load(filename)
 
 
 def read_file_to_dataframe(path_input_file_arxiv, max_lines=-1):
@@ -84,6 +98,19 @@ def compute_categories_counts(df):
     return counts
 
 
+def compute_abstracts_pca(df):
+    vectorizer = TfidfVectorizer(stop_words="english")
+    abstracts_sparse = vectorizer.fit_transform(df.abstract)
+
+    # First transformation (sparse to dense)
+    n_components = 10
+    svd = TruncatedSVD(n_components=n_components, random_state=1)
+    abstracts_svd = svd.fit_transform(abstracts_sparse)
+
+    # Final transformation (dense to 2D)
+    return PCA(n_components=2).fit_transform(abstracts_svd)
+
+
 def main():
     current_directory = os.path.dirname(os.path.abspath(__file__))
     path_input_file_arxiv = os.path.join(current_directory, input_file_arxiv)
@@ -96,6 +123,8 @@ def main():
         with open(os.path.join(path_output_directory, filename), "w") as f:
             json.dump(data, f, separators=(',', ':'))
 
+    np.random.seed(1)  # Reproducibility
+
     df = cached_or_compute(lambda: read_file_to_dataframe(path_input_file_arxiv, limit_max_lines),
                            "df.pkl", serialize_dataframe, deserialize_dataframe)
 
@@ -107,6 +136,23 @@ def main():
 
     print("Writing categories counts...")
     dump_json("categories_counts.json", compute_categories_counts(df))
+
+    pca = cached_or_compute(lambda: compute_abstracts_pca(df),
+                            "pca.npy", serialize_numpy, deserialize_numpy)
+
+    print("Writing (a subset of) papers...")
+    n_papers = 10000
+    paper_indices = np.arange(len(df))
+    np.random.shuffle(paper_indices)
+    selected_paper_indices = paper_indices[:n_papers]
+    df_locs = df.iloc[selected_paper_indices]
+    pca_locs = np.take(pca, selected_paper_indices, axis=0)
+    selected_papers = pd.DataFrame({
+        #"title": df_locs.title,
+        "categories": df_locs.categories,
+        "x": pca_locs[:, 0], "y": pca_locs[:, 1]
+    })
+    dump_json("papers.json", selected_papers.to_dict("index"))
 
     print("All done.")
 

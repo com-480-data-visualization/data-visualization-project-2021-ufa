@@ -3,53 +3,12 @@ import 'tailwindcss/tailwind.css';
 import '@fontsource/poppins';
 //import * as THREE from 'three';
 import * as d3 from 'd3';
+import { drawCloud } from './cloud';
+import { CATEGORIES, getCategoryIndexAndLabel } from './utils';
 
 if (process.env.NODE_ENV === 'development') { // Do not remove: used for hot reload
   require('../index.html');
 }
-
-const categories = [
-  {
-    label: 'Quantum Physics',
-    keywords: ['quant-ph'],
-  },
-  {
-    label: 'Astrophysics',
-    keywords: ['astro-ph'],
-  },
-  {
-    label: 'High Energy Physics',
-    keywords: ['hep-ph', 'hep-th', 'hep-lat'],
-  },
-  {
-    label: 'Condensed Matter Physics',
-    keywords: ['cond-mat'],
-  },
-  {
-    label: 'General Physics',
-    keywords: ['physics'],
-  },
-  {
-    label: 'Computer Science',
-    keywords: ['cs'],
-  },
-  {
-    label: 'Mathematics',
-    keywords: ['math', 'stat', 'nlin'],
-  },
-  {
-    label: 'Biology',
-    keywords: ['bio'],
-  },
-  {
-    label: 'Economics',
-    keywords: ['q-fin'],
-  },
-  {
-    label: 'Other',
-    keywords: null,
-  },
-].map((obj, idx) => ({ ...obj, index: idx }));
 
 const SIMILARITY_BAR_N = 5;
 
@@ -59,20 +18,6 @@ const fetchJson = filename => fetch(`public/data/${filename}`).then(response => 
 let margin = { top: 10, right: 30, bottom: 90, left: 40 },
   widthChart = 260 - margin.left - margin.right,
   heightChart = 250 - margin.top - margin.bottom;
-
-const getCategoryIndexAndLabel = name => {
-  for (let i = 0; i < categories.length; i++) {
-    const category = categories[i];
-    if (category.keywords === null) {
-      return { index: i, label: category.label };
-    }
-    for (let j = 0; j < category.keywords.length; j++) {
-      if (name.includes(category.keywords[j])) {
-        return { index: i, label: category.label };
-      }
-    }
-  }
-};
 
 const categoriesColors = d3.schemeCategory10;
 
@@ -205,7 +150,8 @@ function linePlot(dataLine, lineColor) {
 Promise.all([
   fetchJson('categories_graph.json'),
   fetchJson('categories_counts.json'),
-]).then(([graph, categoriesCounts]) => {
+  fetchJson('papers.json'),
+]).then(([graph, categoriesCounts, papers]) => {
 
   const width = 1000;
   const height = 800;
@@ -316,7 +262,7 @@ Promise.all([
     .style('user-select', 'none')
     .attr('text-anchor', 'middle')
     .selectAll('text')
-    .data(categories)
+    .data(CATEGORIES)
     .join('text')
     .attr('fill', d => categoriesColors[d.index])
     .text(d => d.label);
@@ -402,5 +348,7 @@ Promise.all([
     });*/
 
   d3.select('#categories-graph').node().append(svg.node());
+
+  drawCloud(papers);
   //invalidation.then(() => simulation.stop());
 });
