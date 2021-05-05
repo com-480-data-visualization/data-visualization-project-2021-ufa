@@ -57,9 +57,8 @@ const fetchJson = filename => fetch(`public/data/${filename}`).then(response => 
 
 // Set the dimensions and margins of the bar plot
 let margin = { top: 10, right: 30, bottom: 90, left: 40 },
-  widthBar = 360 - margin.left - margin.right,
-  heightBar = 350 - margin.top - margin.bottom;
-
+  widthChart = 260 - margin.left - margin.right,
+  heightChart = 250 - margin.top - margin.bottom;
 
 const getCategoryIndexAndLabel = name => {
   for (let i = 0; i < categories.length; i++) {
@@ -90,18 +89,18 @@ function barPlot(dataBar){
 
   let svg_bar = d3.select('#similar-bar')
     .append('svg')
-    .attr('width', widthBar + margin.left + margin.right)
-    .attr('height', heightBar + margin.top + margin.bottom)
+    .attr('width', widthChart + margin.left + margin.right)
+    .attr('height', heightChart + margin.top + margin.bottom)
     .append('g')
     .attr('transform',
       'translate(' + margin.left + ',' + margin.top + ')');
   // X axis
   let x = d3.scaleBand()
-    .range([ 0, widthBar ])
+    .range([ 0, widthChart ])
     .domain(dataBar.map(function(d) { return d.id; }))
     .padding(0.2);
   svg_bar.append('g')
-    .attr('transform', 'translate(0,' + heightBar + ')')
+    .attr('transform', 'translate(0,' + heightChart + ')')
     .call(d3.axisBottom(x))
     .selectAll('text')
     .attr('transform', 'translate(-10,0)rotate(-45)')
@@ -110,7 +109,7 @@ function barPlot(dataBar){
   // Add Y axis
   let y = d3.scaleLinear()
     .domain([0, 100])
-    .range([ heightBar, 0]);
+    .range([ heightChart, 0]);
   svg_bar.append('g')
     .call(d3.axisLeft(y));
 
@@ -123,7 +122,7 @@ function barPlot(dataBar){
     .attr('width', x.bandwidth())
     .attr('fill', color)
   // no bar at the beginning thus:
-    .attr('height', ()=> heightBar - y(0)) // always equal to 0
+    .attr('height', ()=> heightChart - y(0)) // always equal to 0
     .attr('y', ()=>  y(0));
 
   const hundred = 100;
@@ -133,9 +132,73 @@ function barPlot(dataBar){
     .transition()
     .duration(200)
     .attr('y', function(d) { return y(d.weightRatio * hundred); })
-    .attr('height', function(d) { return heightBar - y(d.weightRatio * hundred); })
+    .attr('height', function(d) { return heightChart - y(d.weightRatio * hundred); })
     .delay(function(d,i){return(i*50);});
 
+}
+
+function linePlot(dataLine, lineColor){
+
+  d3.select('#published-line').select('svg').remove();
+
+  let line = d3.line()
+    .defined(d => !isNaN(d.value))
+    .x(d => x(d.date))
+    .y(d => y(d.value));
+
+
+  let yAxis = g => g
+    .attr('transform', `translate(${margin.left},0)`)
+    .call(d3.axisLeft(y))
+    //.call(g => g.select(".domain").remove())
+    .call(g => g.select('.tick:last-of-type text').clone()
+      .attr('x', 3)
+      .attr('text-anchor', 'start')
+      .attr('font-weight', 'bold')
+      .text(dataLine.y));
+
+  let xAxis = g => g
+    .attr('transform', `translate(0,${heightChart})`)
+    .call(d3.axisBottom(x).ticks(widthChart / 80));
+
+
+  let y = d3.scaleLinear()
+    .domain([0, d3.max(dataLine, d=> d.value)]).nice()
+    .range([heightChart, margin.top]);
+
+  let x = d3.scaleTime()
+    .domain(d3.extent(dataLine, d => d.date))
+    .range([margin.left, widthChart+ margin.left]);
+
+
+  const svg = d3.select('#published-line')
+    .append('svg')
+    .attr('width', widthChart + margin.left + margin.right)
+    .attr('height', heightChart + margin.top + margin.bottom);
+  
+  svg.append('g')
+    .call(xAxis);
+
+  svg.append('g')
+    .call(yAxis);
+  
+  let path = svg.append('path')
+    .datum(dataLine)
+    .attr('fill', 'none')
+    .attr('stroke', lineColor)
+    .attr('stroke-width', 1.5)
+    .attr('d', line);
+
+
+  let totalLength = path.node().getTotalLength();
+
+  path.attr('stroke-dasharray', totalLength)
+    .attr('stroke-dashoffset', totalLength)
+    .transition()
+    .duration(2000)
+    .attr('stroke-dashoffset', 0);
+
+  d3.select('#published-line').node().append(svg.node());
 }
 
 
@@ -170,9 +233,11 @@ Promise.all([
   let hoveredNode = null;
 
   const updateHighlights = () => {
+    
     const node = selectedNode || hoveredNode;
     const connectedSet = new Set();
     const connectedWeights = [];
+    const dataLine = [];
     if (node) {
       connectedSet.add(node.id);
       links.forEach(l => {
@@ -187,6 +252,12 @@ Promise.all([
           connectedWeights.push({ id: neighbour, weight: l.weight });
         }
       });
+
+      //Line data(MOCK)
+      const items = [0,10,40,50,80,99.47];
+      const date = [[2007,3,23],[2007,3,24],[2007,3,25],[2007,3,26],[2007,3,29],[2007,4,1]];
+      items.forEach((item,i) => (dataLine.push({ date: new Date(date[i][0], date[i][1], date[i][2]), value: item })));
+
     }
     const weightSum = connectedWeights.map(({ weight }) => weight).reduce((a, b) => a + b, 0);
     const connectedWeightRatios = connectedWeights
@@ -201,6 +272,7 @@ Promise.all([
     d3.select('#categories-selected-count').text(node ? categoriesCounts[node.id].toLocaleString() : '-');
 
     barPlot(connectedWeightRatios);
+    linePlot(dataLine,node?color(node):'');
   };
 
   const drag = simulation => {
