@@ -69,6 +69,7 @@ The latest version is automatically built and made available on GitHub pages:
 
 While all the parts can be treated separately, they will interact with each other to produce a rich user experience. We describe their behaviors below.
 
+Our main idea is to show changes(most used words, categories, dominance of categories) throughout time. 
 #### Introduction modal (0)
 
 When the user lands on the page, a modal will pop up to briefly explain our motivation and the goals of the visualization. This allows us to restrict the amount of textual description to a minimum, and provide more space to the graphics.
@@ -83,7 +84,7 @@ A weighted graph of all categories, with edges proportional to the number of pap
 
 #### Cloud of points representing the papers individually (3)
 
-A cloud of points representing the papers individually, which position were determined using PCA on the title/abstract. Papers are highlighted only if they fall in the selected time range, and are either of the selected category, or the *hovered* one. Moreover, you can explore the papers either by searching or clicking one of the points.
+A cloud of points representing the papers individually, which position were determined using PCA on the title/abstract. Papers are highlighted only if they fall in the selected time range, and are either of the selected category, or the *hovered* one. Moreover, you can explore the papers either by searching or clicking one of the points. We are using PCA to see implicit relation between categories/papers. 
 
 #### Bar chart of similar categories (4)
 
