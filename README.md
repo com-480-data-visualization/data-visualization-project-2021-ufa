@@ -33,7 +33,7 @@ We are aiming to target two audiences jointly:
 
 ### Exploratory Data Analysis
 
-Please refer to the following notebook: [`exploratory_data_analysis.ipynb`](exploratory_data_analysis.ipynb).
+Please refer to the following notebook: [`python/exploratory_data_analysis.ipynb`](python/exploratory_data_analysis.ipynb).
 
 Our preliminary analysis served different purposes. First off, it allowed us to assess the data, evaluate how much preprocessing work was required before we could get started. In our case, the data required very little preprocessing, and we could get started right away. The second purpose was to validate the feasibility of our ideas; that is to verify that the data was rich enough, and that we could extract the patterns we wanted. 
 
