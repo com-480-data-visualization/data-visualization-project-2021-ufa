@@ -4,21 +4,17 @@ import { CATEGORIES, getCategoryIndexAndLabel } from './common';
 
 export const drawCloud = papers => {
 
-  let mousePos = { x: 0, y: 0 };
-
   const domContainer = document.getElementById('papers-cloud');
   const aspect = 1000 / 800; // TODO match the network
-
-  domContainer.addEventListener('mousemove', event => {
-    mousePos = { x: event.clientX / domContainer.clientWidth - 0.5, y: event.clientY / domContainer.clientHeight - 0.5 };
-  });
+  const width = domContainer.clientWidth, height = width / aspect;
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(10, aspect, 0.1, 10);
-  camera.position.z = 2;
+  const initialScale = 2;
+  camera.position.z = initialScale;
 
   const renderer = new THREE.WebGLRenderer();
-  renderer.setSize(domContainer.clientWidth, domContainer.clientWidth / aspect);
+  renderer.setSize(width, height);
   domContainer.appendChild(renderer.domElement);
 
   const squareSize = 0.004;
@@ -48,12 +44,46 @@ export const drawCloud = papers => {
     particle.position.y = y;
   });
 
-  function render() {
-    const sensitivity = 0.03;
-    camera.position.x = mousePos.x * sensitivity;
-    camera.position.y = -mousePos.y * sensitivity;
+  const render = () => {
     renderer.render(scene, camera);
     requestAnimationFrame(render);
-  }
+  };
+
+  const zoom = d3.zoom()
+    .scaleExtent([0.5, 4])
+    // Function is taken from: https://github.com/d3/d3-zoom/blob/master/README.md#zoom_wheelDelta
+    // Direction was inverted
+    .wheelDelta(event => event.deltaY * (event.deltaMode === 1 ? 0.05 : event.deltaMode ? 1 : 0.002))
+    .on('zoom', event => {
+      if (event.sourceEvent) {
+        console.log(event);
+        const newZ = event.transform.k;
+        if (newZ !== camera.position.z) {
+          const { offsetX, offsetY } = event.sourceEvent;
+          const vector = new THREE.Vector3(
+            offsetX / width * 2 - 1,
+            -(offsetY / height) * 2 + 1,
+            1
+          );
+          vector.unproject(camera);
+          const direction = vector.sub(camera.position).normalize();
+          const distance = (newZ - camera.position.z) / direction.z;
+          const position = camera.position.clone().add(direction.multiplyScalar(distance));
+          camera.position.set(position.x, position.y, newZ);
+        } else {
+          const { movementX, movementY } = event.sourceEvent;
+          const vFOV = camera.fov * Math.PI / 180;
+          const scaleHeight = 2 * Math.tan(vFOV / 2) * camera.position.z;
+          const currentScale = height / scaleHeight;
+          camera.position.set(camera.position.x - movementX / currentScale, camera.position.y + movementY / currentScale, camera.position.z);
+        }
+      }
+    });
+
+  // Add zoom listener
+  const view = d3.select(renderer.domElement).style('cursor', 'pointer');
+  view.call(zoom).call(zoom.transform, d3.zoomIdentity.scale(initialScale));
+
+  // Start render loop
   render();
 };
