@@ -1,3 +1,5 @@
+import * as d3 from 'd3';
+
 export const CATEGORIES = Object.freeze([
   {
     label: 'Quantum Physics',
@@ -9,7 +11,7 @@ export const CATEGORIES = Object.freeze([
   },
   {
     label: 'High Energy Physics',
-    keywords: ['hep-ph', 'hep-th', 'hep-lat'],
+    keywords: ['hep-ph', 'hep-th', 'hep-lat', 'hep-ex'],
   },
   {
     label: 'Condensed Matter Physics',
@@ -17,7 +19,7 @@ export const CATEGORIES = Object.freeze([
   },
   {
     label: 'General Physics',
-    keywords: ['physics'],
+    keywords: ['physics', 'nucl-ex'],
   },
   {
     label: 'Computer Science',
@@ -25,7 +27,7 @@ export const CATEGORIES = Object.freeze([
   },
   {
     label: 'Mathematics',
-    keywords: ['math', 'stat', 'nlin'],
+    keywords: ['math', 'stat', 'nlin', 'q-alg'],
   },
   {
     label: 'Biology',
@@ -33,7 +35,7 @@ export const CATEGORIES = Object.freeze([
   },
   {
     label: 'Economics',
-    keywords: ['q-fin'],
+    keywords: ['econ', 'q-fin'],
   },
   {
     label: 'Other',
@@ -53,4 +55,16 @@ export const getCategoryIndexAndLabel = name => {
       }
     }
   }
+};
+
+// TODO rename/clean that
+export const margin = { top: 10, right: 30, bottom: 90, left: 40 };
+export const widthChart = 260 - margin.left - margin.right;
+export const heightChart = 250 - margin.top - margin.bottom;
+
+export const categoriesColors = d3.schemeCategory10;
+
+export const color = d => {
+  const { index } = getCategoryIndexAndLabel(d.id);
+  return categoriesColors[index];
 };

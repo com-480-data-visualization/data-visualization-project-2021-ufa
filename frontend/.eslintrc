@@ -34,6 +34,7 @@
     "func-call-spacing": "warn",
     "space-in-parens": "warn",
     "no-trailing-spaces": "warn",
+    "eol-last": "warn",
     "constructor-super": "warn",
     "for-direction": "warn",
     "getter-return": "warn",

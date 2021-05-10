@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import * as d3 from 'd3';
-import { CATEGORIES, getCategoryIndexAndLabel } from './utils';
+import { CATEGORIES, getCategoryIndexAndLabel } from './common';
 
 export const drawCloud = papers => {
 
