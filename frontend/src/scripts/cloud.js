@@ -21,7 +21,7 @@ export const drawCloud = papers => {
   renderer.setSize(domContainer.clientWidth, domContainer.clientWidth / aspect);
   domContainer.appendChild(renderer.domElement);
 
-  const squareSize = 0.002;
+  const squareSize = 0.004;
   const geometry = new THREE.PlaneGeometry(squareSize, squareSize);
   const colorScheme = d3.schemeCategory10; // TODO improve this
   const materials = CATEGORIES.map(category => new THREE.MeshBasicMaterial({
@@ -37,7 +37,7 @@ export const drawCloud = papers => {
   scene.background = new THREE.Color('#fffdf5');
 
   // eslint-disable-next-line no-unused-vars
-  Object.entries(papers).forEach(([id, { categories, x, y }]) => {
+  Object.entries(papers).slice(0, 2500).forEach(([id, { categories, x, y }]) => {
     const firstCategory = categories.split(' ')[0];
     const categoryIndex = getCategoryIndexAndLabel(firstCategory).index;
     const particle = new THREE.Mesh(geometry, materials[categoryIndex]);

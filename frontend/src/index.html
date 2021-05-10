@@ -6,34 +6,30 @@
   <title>Data Visualization</title>
 </head>
 <body>
-  <div>
-    <div class="text-center mt-2">
-      <h1 class="text-3xl">arXiv visualization</h1>
-      <span class="mt-2">Adina-Maria Ciubotaru &middot; Florian Cassayre &middot; Utku Görkem Ertürk</span>
-    </div>
-    <div class="grid grid-cols-4 gap-4">
-      <div class="col-span-2">
-        <div id="categories-graph"></div>
-        <div class="text-center">
+  <div class="h-screen">
+    <div class="grid grid-cols-4 grid-rows-3 gap-4 h-full">
+      <div class="col-span-2 row-span-2 overflow-hidden">
+        <div id="categories-graph" class="w-full h-full"></div>
+      </div>
+      <div class="col-span-2 row-span-2 overflow-hidden">
+        <div id="papers-cloud"></div>
+      </div>
+      <div class="col-start-1 col-span-1 overflow-hidden text-center">
           <div>
             Category:
-            <span id="categories-selected-category" class="font-bold"></span>
+            <span id="categories-selected-category" class="font-bold">-</span>
           </div>
           <div>
             Field:
-            <span id="categories-selected-field" class="font-bold"></span>
+            <span id="categories-selected-field" class="font-bold">-</span>
           </div>
           <div>
             Papers:
-            <span id="categories-selected-count" class="font-bold"></span>
+            <span id="categories-selected-count" class="font-bold">-</span>
           </div>
         </div>
-      </div>
-      <div class="col-span-2">
-        <div id="papers-cloud"></div>
-      </div>
-      <div id="similar-bar" class="col-start-2 col-span-1"></div>
-      <div id="published-line" class="col-start-3 col-span-1"></div>
+      <div id="similar-bar" class="col-start-2 col-span-1 w-full h-full overflow-hidden"></div>
+      <div id="published-line" class="col-start-3 col-span-1 w-full h-full overflow-hidden"></div>
     </div>
   </div>
 </body>

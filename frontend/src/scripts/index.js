@@ -1,10 +1,9 @@
 import '../styles/index.scss';
 import 'tailwindcss/tailwind.css';
 import '@fontsource/poppins';
-//import * as THREE from 'three';
 import * as d3 from 'd3';
-import { drawCloud } from './cloud';
 import { CATEGORIES, getCategoryIndexAndLabel } from './utils';
+import { drawCloud } from './cloud';
 
 if (process.env.NODE_ENV === 'development') { // Do not remove: used for hot reload
   require('../index.html');
@@ -34,8 +33,8 @@ function barPlot(dataBar) {
 
   let svgBar = d3.select('#similar-bar')
     .append('svg')
-    .attr('width', widthChart + margin.left + margin.right)
-    .attr('height', heightChart + margin.top + margin.bottom)
+    .attr('viewBox', [0, 0, widthChart + margin.left + margin.right, heightChart + margin.top + margin.bottom].join(' '))
+    .attr('class', 'max-w-full max-h-full')
     .append('g')
     .attr('transform',
       'translate(' + margin.left + ',' + margin.top + ')');
@@ -82,6 +81,8 @@ function barPlot(dataBar) {
 
 }
 
+barPlot([]);
+
 function linePlot(dataLine, lineColor) {
 
   d3.select('#published-line').select('svg').remove();
@@ -118,8 +119,8 @@ function linePlot(dataLine, lineColor) {
 
   const svg = d3.select('#published-line')
     .append('svg')
-    .attr('width', widthChart + margin.left + margin.right)
-    .attr('height', heightChart + margin.top + margin.bottom);
+    .attr('viewBox', [0, 0, widthChart + margin.left + margin.right, heightChart + margin.top + margin.bottom].join(' '))
+    .attr('class', 'max-w-full max-h-full');
 
   svg.append('g')
     .call(xAxis);
@@ -145,6 +146,8 @@ function linePlot(dataLine, lineColor) {
 
   d3.select('#published-line').node().append(svg.node());
 }
+
+linePlot([], '');
 
 
 Promise.all([
@@ -253,8 +256,8 @@ Promise.all([
   };
 
   const svg = d3.create('svg')
-    //.attr('width', width).attr('height', height)
-    .attr('viewBox', [0, 0, width, height].join(' '));
+    .attr('viewBox', [0, 0, width, height].join(' '))
+    .attr('class', 'max-w-full max-h-full');
 
   const gClusters = svg.append('g')
     .attr('font-weight', 'bold')
