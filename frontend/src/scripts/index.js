@@ -1,6 +1,7 @@
 import '../styles/index.scss';
 import 'tailwindcss/tailwind.css';
 import '@fontsource/poppins';
+import { Slider } from './slider';
 import { barPlot } from './bar';
 import { drawCloud } from './cloud';
 import { drawGraph } from './graph';
@@ -21,4 +22,9 @@ Promise.all([
   drawCloud(papers);
   barPlot();
   linePlot();
+  let slider = new Slider();
+  slider.drawSlider();
+  slider.sliderTime.on('onchange', val => {
+    //here change data
+  });
 });

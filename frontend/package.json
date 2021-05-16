@@ -33,6 +33,7 @@
     "copy-webpack-plugin": "^6.4.0",
     "cross-env": "^7.0.3",
     "css-loader": "^5.0.1",
+    "d3-simple-slider": "^1.10.4",
     "eslint": "^7.15.0",
     "eslint-loader": "^4.0.2",
     "eslint-plugin-only-warn": "^1.0.2",
