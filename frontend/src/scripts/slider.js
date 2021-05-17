@@ -3,15 +3,15 @@ import { sliderBottom } from 'd3-simple-slider';
 
 export class Slider {
   constructor() {
-    this.dataTime = d3.range(0, 100).map(d => new Date(1995 + d, 10, 3));
+    this.dataTime = d3.range(0, 14).map(d => new Date(2007 + d, 10, 3));
     this.sliderTime = sliderBottom()
       .min(d3.min(this.dataTime))
       .max(d3.max(this.dataTime))
       .step(1000 * 60 * 60 * 24 * 365)
       .width(700)
       .tickFormat(d3.timeFormat('%Y'))
-      .ticks(10)
-      .default(new Date(1998, 10, 3));
+      .tickValues(this.dataTime)
+      .default(new Date(2007, 10, 3));
 
 
     this.svg = d3

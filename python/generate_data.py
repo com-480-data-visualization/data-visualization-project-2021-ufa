@@ -110,6 +110,19 @@ def compute_abstracts_pca(df):
     # Final transformation (dense to 2D)
     return PCA(n_components=2).fit_transform(abstracts_svd)
 
+def get_papers(n_papers,df,pca):
+    paper_indices = np.arange(len(df))
+    np.random.shuffle(paper_indices)
+    selected_paper_indices = paper_indices[:n_papers]
+    df_locs = df.iloc[selected_paper_indices]
+    pca_locs = np.take(pca, selected_paper_indices, axis=0)
+    selected_papers = pd.DataFrame({
+        #"title": df_locs.title,
+        "categories": df_locs.categories,
+        "x": pca_locs[:, 0], "y": pca_locs[:, 1]
+    })
+    return selected_papers
+
 
 def main():
     current_directory = os.path.dirname(os.path.abspath(__file__))
@@ -130,29 +143,27 @@ def main():
 
     g = cached_or_compute(lambda: compute_graph(df),
                           "categories_graph.pkl", serialize_network, deserialize_network)
-
+    year_graphs_series = df.groupby(df.update_date.dt.year).apply(lambda x: nx.readwrite.json_graph.node_link_data(compute_graph(x)))
+    all_graphs_series = year_graphs_series.append(pd.Series({"All":nx.readwrite.json_graph.node_link_data(g)}))
     print("Writing categories graph data...")
-    dump_json("categories_graph.json", nx.readwrite.json_graph.node_link_data(g))
+
+    dump_json("categories_graph.json", all_graphs_series.to_dict())
 
     print("Writing categories counts...")
-    dump_json("categories_counts.json", compute_categories_counts(df))
+    year_categories_counts_series = df.groupby(df.update_date.dt.year).apply(compute_categories_counts)
+    all_categories_counts_series = year_categories_counts_series.append(pd.Series({"All":compute_categories_counts(df)}))
+    dump_json("categories_counts.json", all_categories_counts_series.to_dict())
 
     pca = cached_or_compute(lambda: compute_abstracts_pca(df),
                             "pca.npy", serialize_numpy, deserialize_numpy)
+    
+    year_pca_series = df.groupby(df.update_date.dt.year).apply(lambda x: get_papers(1000,x,compute_abstracts_pca(x)))
+
 
     print("Writing (a subset of) papers...")
-    n_papers = 10000
-    paper_indices = np.arange(len(df))
-    np.random.shuffle(paper_indices)
-    selected_paper_indices = paper_indices[:n_papers]
-    df_locs = df.iloc[selected_paper_indices]
-    pca_locs = np.take(pca, selected_paper_indices, axis=0)
-    selected_papers = pd.DataFrame({
-        #"title": df_locs.title,
-        "categories": df_locs.categories,
-        "x": pca_locs[:, 0], "y": pca_locs[:, 1]
-    })
-    dump_json("papers.json", selected_papers.to_dict("index"))
+    all_pca_dict = {level: year_pca_series.xs(level).to_dict('index') for level in year_pca_series.index.levels[0]}
+    all_pca_dict["All"] = get_papers(1000,df,pca).to_dict("index")
+    dump_json("papers.json", all_pca_dict)
 
     print("All done.")
 

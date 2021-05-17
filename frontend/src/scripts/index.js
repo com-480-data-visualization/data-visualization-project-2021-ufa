@@ -18,13 +18,18 @@ Promise.all([
   fetchJson('categories_counts.json'),
   fetchJson('papers.json'),
 ]).then(([graph, categoriesCounts, papers]) => {
-  drawGraph(graph, categoriesCounts);
-  drawCloud(papers);
+  drawGraph(graph['All'], categoriesCounts['All']);
+  drawCloud(papers['All']);
   barPlot();
   linePlot();
+
   let slider = new Slider();
   slider.drawSlider();
-  slider.sliderTime.on('onchange', val => {
-    //here change data
+  slider.sliderTime.on('end', val => {
+    console.log(val.getFullYear());
+    //document.getElementById("categories-graph").innerHTML = '';
+    document.getElementById('papers-cloud').innerHTML = '';
+    //drawGraph(graph[val.getFullYear()], categoriesCounts[val.getFullYear()]);
+    drawCloud(papers[val.getFullYear()]);
   });
 });
