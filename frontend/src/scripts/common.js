@@ -58,7 +58,7 @@ export const getCategoryIndexAndLabel = name => {
 };
 
 // TODO rename/clean that
-export const margin = { top: 10, right: 30, bottom: 90, left: 40 };
+export const margin = { top: 10, right: 30, bottom: 70, left: 40 };
 export const widthChart = 260 - margin.left - margin.right;
 export const heightChart = 250 - margin.top - margin.bottom;
 

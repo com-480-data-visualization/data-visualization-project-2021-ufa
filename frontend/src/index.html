@@ -7,33 +7,33 @@
 </head>
 <body>
   <div class="h-screen">
-    <div class="grid grid-cols-4 grid-rows-4 gap-4 h-full">
-      <div class="col-start-2 col-span-2 content-center overflow-hidden">
+    <div class="grid grid-cols-4 grid-rows-12 gap-4 h-full">
+      <div class="col-start-2 col-span-2 row-span-2 content-center overflow-hidden">
         <div class="text-center"><p id="value-time"></p></div>
         <div class="w-full h-full" id="slider-time"></div>
       </div>
-      <div class="col-span-2 row-span-2 overflow-hidden">
+      <div class="col-span-2 row-span-6 overflow-hidden">
         <div id="categories-graph" class="w-full h-full"></div>
       </div>
-      <div class="col-span-2 row-span-2 overflow-hidden">
+      <div class="col-span-2 row-span-6 overflow-hidden">
         <div id="papers-cloud"></div>
       </div>
-      <div class="col-start-1 col-span-1 overflow-hidden text-center">
-          <div>
-            Category:
-            <span id="categories-selected-category" class="font-bold">-</span>
-          </div>
-          <div>
-            Field:
-            <span id="categories-selected-field" class="font-bold">-</span>
-          </div>
-          <div>
-            Papers:
-            <span id="categories-selected-count" class="font-bold">-</span>
-          </div>
+      <div class="col-start-1 col-span-1 row-span-4 overflow-hidden text-center">
+        <div>
+          Category:
+          <span id="categories-selected-category" class="font-bold">-</span>
         </div>
-      <div id="similar-bar" class="col-start-2 col-span-1 w-full h-full overflow-hidden"></div>
-      <div id="published-line" class="col-start-3 col-span-1 w-full h-full overflow-hidden"></div>
+        <div>
+          Field:
+          <span id="categories-selected-field" class="font-bold">-</span>
+        </div>
+        <div>
+          Papers:
+          <span id="categories-selected-count" class="font-bold">-</span>
+        </div>
+      </div>
+      <div id="similar-bar" class="col-start-2 col-span-1 row-span-4 w-full h-full overflow-hidden"></div>
+      <div id="published-line" class="col-start-3 col-span-1 row-span-4 w-full h-full overflow-hidden"></div>
     </div>
   </div>
 </body>

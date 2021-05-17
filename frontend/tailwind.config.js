@@ -5,7 +5,11 @@ module.exports = {
   ],
   darkMode: false,
   theme: {
-    extend: {},
+    extend: {
+      gridTemplateRows: {
+        '12': 'repeat(12, minmax(0, 1fr))',
+      },
+    },
   },
   variants: {},
   plugins: [],
