@@ -1,13 +1,17 @@
 import * as THREE from 'three';
 import * as d3 from 'd3';
-import { CATEGORIES, getCategoryIndexAndLabel } from './common';
+import * as seedrandom from 'seedrandom';
+import { getPaperMetadata, urlForPaper } from './api';
+// eslint-disable-next-line sort-imports
+import { CATEGORIES, color, getCategoryIndexAndLabel } from './common';
 
 export const drawCloud = papers => {
 
   const domContainer = document.getElementById('papers-cloud');
-  const aspect = 1000 / 800; // TODO match the network
-  const width = domContainer.clientWidth, height = width / aspect;
-
+  const containerAspect = domContainer.clientWidth / domContainer.clientHeight;
+  const aspect = containerAspect; // If we need to fix the aspect, change this value
+  const width = containerAspect < aspect ? domContainer.clientWidth : domContainer.clientHeight * aspect,
+    height = width / aspect;
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(10, aspect, 0.1, 10);
   const initialScale = 2;
@@ -15,6 +19,7 @@ export const drawCloud = papers => {
 
   const renderer = new THREE.WebGLRenderer();
   renderer.setSize(width, height);
+  renderer.domElement.classList.add('m-auto');
   domContainer.appendChild(renderer.domElement);
 
   const squareSize = 0.004;
@@ -32,31 +37,56 @@ export const drawCloud = papers => {
 
   scene.background = new THREE.Color('#fffdf5');
 
-  // eslint-disable-next-line no-unused-vars
+  const tooltip = d3.select('#cloud-tooltip'), tooltipLink = d3.select('#cloud-tooltip-link'),
+    tooltipDescription = d3.select('#cloud-tooltip-description'),
+    tooltipCategories = d3.select('#cloud-tooltip-categories');
+
+  let bbMin = new THREE.Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE), bbMax = bbMin.clone().negate();
   Object.entries(papers).slice(0, 2500).forEach(([id, { categories, x, y }]) => {
-    const firstCategory = categories.split(' ')[0];
+    const categoriesList = categories.split(' ');
+    const firstCategory = categoriesList[0];
     const categoryIndex = getCategoryIndexAndLabel(firstCategory).index;
     const particle = new THREE.Mesh(geometry, materials[categoryIndex]);
     parentContainer.add(particle);
 
-    particle.position.z = -Math.random();
+    // Randomize the z-coordinates for depth effect (without affecting the data)
+    const zRange = 0.2;
+    particle.position.z = -zRange * seedrandom(id)();
     particle.position.x = x;
     particle.position.y = y;
+
+    // Custom properties
+    particle.userData = { id, categories: categoriesList };
+
+    bbMin.min(particle.position);
+    bbMax.max(particle.position);
   });
+
+  let selectedObject = null;
 
   const render = () => {
     renderer.render(scene, camera);
+    const c = 0.2;
+    if (selectedObject !== null) {
+      camera.position.x += (selectedObject.position.x - camera.position.x) * c;
+      camera.position.y += (selectedObject.position.y - camera.position.y) * c;
+    }
     requestAnimationFrame(render);
   };
 
+  const minScale = 0.5, maxScale = 4;
+  bbMin.setZ(minScale);
+  bbMax.setZ(maxScale);
   const zoom = d3.zoom()
-    .scaleExtent([0.5, 4])
+    .scaleExtent([minScale, maxScale])
     // Function is taken from: https://github.com/d3/d3-zoom/blob/master/README.md#zoom_wheelDelta
     // Direction was inverted
     .wheelDelta(event => event.deltaY * (event.deltaMode === 1 ? 0.05 : event.deltaMode ? 1 : 0.002))
     .on('zoom', event => {
+      selectedObject = null;
+      tooltip.classed('hidden', true);
+
       if (event.sourceEvent) {
-        console.log(event);
         const newZ = event.transform.k;
         if (newZ !== camera.position.z) {
           const { offsetX, offsetY } = event.sourceEvent;
@@ -77,12 +107,59 @@ export const drawCloud = papers => {
           const currentScale = height / scaleHeight;
           camera.position.set(camera.position.x - movementX / currentScale, camera.position.y + movementY / currentScale, camera.position.z);
         }
+        camera.position.clamp(bbMin, bbMax);
       }
     });
 
   // Add zoom listener
   const view = d3.select(renderer.domElement).style('cursor', 'pointer');
   view.call(zoom).call(zoom.transform, d3.zoomIdentity.scale(initialScale));
+  view.call(zoom).on('dblclick.zoom', null);
+
+  const raycaster = new THREE.Raycaster();
+
+  d3.select(renderer.domElement).on('click', e => {
+    const previousSelected = selectedObject;
+    selectedObject = null;
+
+    const bounds = renderer.domElement.getBoundingClientRect();
+    const mouse = { x: ((e.clientX - bounds.left) / width) * 2 - 1, y: -((e.clientY - bounds.top) / height) * 2 + 1 };
+    raycaster.setFromCamera(mouse, camera);
+    const intersections = raycaster.intersectObjects(scene.children, true);
+    if (intersections.length > 0) {
+      const intersection = intersections[0];
+      selectedObject = intersection.object;
+
+      const id = selectedObject.userData.id;
+
+      if (selectedObject !== previousSelected) {
+        tooltip.classed('hidden', false);
+        tooltipLink.text(id).attr('href', urlForPaper(id));
+        tooltipDescription.text('...');
+        tooltipCategories.text('...');
+
+        getPaperMetadata(id).then(xml => {
+          if (selectedObject !== null && selectedObject.userData.id === id) { // Verify that the object is still selected
+            const entry = xml.querySelector('feed > entry');
+            const title = entry.querySelector('title');
+            tooltipDescription.text(title.textContent);
+            tooltipCategories.html(null);
+            tooltipCategories
+              .selectAll('span')
+              .data(selectedObject.userData.categories)
+              .enter()
+              .append('span')
+              .text(d => d)
+              .style('color', d => color({ id: d }))
+              .classed('px-1', true)
+              .classed('text-glow', true);
+          }
+        });
+      }
+    } else {
+      tooltip.classed('hidden', true);
+    }
+  });
 
   // Start render loop
   render();

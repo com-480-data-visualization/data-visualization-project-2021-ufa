@@ -60,6 +60,7 @@
     "@fontsource/poppins": "^4.2.2",
     "core-js": "^3.8.1",
     "d3": "^6.7.0",
+    "seedrandom": "^3.0.5",
     "three": "^0.128.0"
   }
 }
