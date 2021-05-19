@@ -51,8 +51,17 @@
       <div class="col-span-2 row-span-6 overflow-hidden">
         <div id="categories-graph" class="w-full h-full"></div>
       </div>
-      <div class="col-span-2 row-span-6 overflow-hidden">
-        <div id="papers-cloud"></div>
+      <div class="col-span-2 row-span-6 overflow-hidden relative">
+        <div id="cloud-tooltip" class="absolute w-min left-1/2 top-1/2 hidden" style="transform: translate(-50%, -120%)">
+          <div class="bg-black text-white text-sm rounded py-1 px-4 right-0 bottom-full text-center max-w-xl">
+            <a href="#" target="_blank" id="cloud-tooltip-link" class="block whitespace-nowrap underline"></a>
+            <span id="cloud-tooltip-description" class="block whitespace-nowrap overflow-hidden overflow-ellipsis"></span>
+            <span id="cloud-tooltip-categories" class="block whitespace-nowrap overflow-hidden overflow-ellipsis"></span>
+            <svg class="absolute text-black h-2 w-full left-0 top-full" x="0px" y="0px" viewBox="0 0 255 255"
+                 xml:space="preserve"><polygon class="fill-current" points="0,0 127.5,127.5 255,0"/></svg>
+          </div>
+        </div>
+        <div id="papers-cloud" class="w-full h-full"></div>
       </div>
       <div class="col-start-1 col-span-1 row-span-4 overflow-hidden text-center">
         <div>

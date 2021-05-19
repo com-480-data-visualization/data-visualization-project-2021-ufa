@@ -156,14 +156,21 @@ def main():
 
     pca = cached_or_compute(lambda: compute_abstracts_pca(df),
                             "pca.npy", serialize_numpy, deserialize_numpy)
-    
-    year_pca_series = df.groupby(df.update_date.dt.year).apply(lambda x: get_papers(1000,x,compute_abstracts_pca(x)))
-
 
     print("Writing (a subset of) papers...")
-    all_pca_dict = {level: year_pca_series.xs(level).to_dict('index') for level in year_pca_series.index.levels[0]}
-    all_pca_dict["All"] = get_papers(1000,df,pca).to_dict("index")
-    dump_json("papers.json", all_pca_dict)
+    n_papers = 10000
+    paper_indices = np.arange(len(df))
+    np.random.shuffle(paper_indices)
+    selected_paper_indices = paper_indices[:n_papers]
+    df_locs = df.iloc[selected_paper_indices]
+    pca_locs = np.take(pca, selected_paper_indices, axis=0)
+    selected_papers = pd.DataFrame({
+        #"title": df_locs.title,
+        "categories": df_locs.categories,
+        "date": df_locs.update_date.astype(str),
+        "x": pca_locs[:, 0], "y": pca_locs[:, 1]
+    })
+    dump_json("papers.json", selected_papers.to_dict("index"))
 
     print("All done.")
 

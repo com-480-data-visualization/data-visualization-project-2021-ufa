@@ -20,18 +20,33 @@ Promise.all([
   fetchJson('categories_counts.json'),
   fetchJson('papers.json'),
 ]).then(([graph, categoriesCounts, papers]) => {
+  Object.keys(papers).forEach(key => {
+    papers[key]['date'] = new Date(papers[key]['date']);
+  });
   drawGraph(graph['All'], categoriesCounts['All']);
-  drawCloud(papers['All']);
+  drawCloud(papers);
   barPlot();
   linePlot();
 
+
+  console.log(papers);
   let slider = new Slider();
   slider.drawSlider();
   slider.sliderTime.on('end', val => {
-    console.log(val.getFullYear());
-    //document.getElementById("categories-graph").innerHTML = '';
+    //document.querySelector('g.parameter-value text').innerHTML = val + 2007;
+    let filteredPapers = papers;
+    if (val != 14) {
+      filteredPapers = Object.keys(papers)
+        .filter(key => papers[key]['date'].getFullYear() == val + 2007)
+        .reduce((obj, key) => {
+          obj[key] = papers[key];
+          return obj;
+        }, {});
+    }
+    //console.log(val.getFullYear());
     document.getElementById('papers-cloud').innerHTML = '';
     //drawGraph(graph[val.getFullYear()], categoriesCounts[val.getFullYear()]);
-    drawCloud(papers[val.getFullYear()]);
+    drawCloud(filteredPapers);
+
   });
 });
