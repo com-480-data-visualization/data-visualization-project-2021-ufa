@@ -6,11 +6,13 @@ import { barPlot } from './bar';
 import { drawCloud } from './cloud';
 import { drawGraph } from './graph';
 import { linePlot } from './time';
+import { makeBodyVisible} from './visibleBody';
 
 if (process.env.NODE_ENV === 'development') { // Do not remove: used for hot reload
   require('../index.html');
 }
 
+makeBodyVisible();
 const fetchJson = filename => fetch(`public/data/${filename}`).then(response => response.json());
 
 Promise.all([
