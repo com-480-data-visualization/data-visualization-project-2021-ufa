@@ -31,15 +31,17 @@ Promise.all([
   let slider = new Slider();
   slider.drawSlider();
   slider.sliderTime.on('end', val => {
-    let filteredPapers = Object.keys(papers)
-      .filter(key => papers[key]['date'].getFullYear() == val.getFullYear())
-      .reduce((obj, key) => {
-        obj[key] = papers[key];
-        return obj;
-      }, {});
-
-    console.log(val.getFullYear());
-    //document.getElementById("categories-graph").innerHTML = '';
+    //document.querySelector('g.parameter-value text').innerHTML = val + 2007;
+    let filteredPapers = papers;
+    if (val != 14) {
+      filteredPapers = Object.keys(papers)
+        .filter(key => papers[key]['date'].getFullYear() == val + 2007)
+        .reduce((obj, key) => {
+          obj[key] = papers[key];
+          return obj;
+        }, {});
+    }
+    //console.log(val.getFullYear());
     document.getElementById('papers-cloud').innerHTML = '';
     //drawGraph(graph[val.getFullYear()], categoriesCounts[val.getFullYear()]);
     drawCloud(filteredPapers);

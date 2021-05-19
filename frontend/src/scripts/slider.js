@@ -3,16 +3,20 @@ import { sliderBottom } from 'd3-simple-slider';
 
 export class Slider {
   constructor() {
-    this.dataTime = d3.range(0, 14).map(d => new Date(2007 + d, 10, 3));
+    this.dataTime = d3.range(0, 15).map(d => new Date(2007 + d, 10, 3));
+    let dataTimeTicks = this.dataTime.map(d => d.getFullYear().toString());
+    dataTimeTicks[dataTimeTicks.length - 1] = 'All Time';
+    console.log(dataTimeTicks);
     this.sliderTime = sliderBottom()
-      .min(d3.min(this.dataTime))
-      .max(d3.max(this.dataTime))
-      .step(1000 * 60 * 60 * 24 * 365)
+      .min(0)
+      .max(14)
+      .step(1)
       .width(700)
-      .tickFormat(d3.timeFormat('%Y'))
-      .tickValues(this.dataTime)
-      .default(new Date(2007, 10, 3));
-
+      .tickFormat((d, i) => dataTimeTicks[i])
+      .ticks(15)
+      .default(14);
+    //.tickValues(this.dataTime)
+    //.default(new Date(2021, 10, 3));
 
     this.svg = d3
       .create('svg')
@@ -28,5 +32,6 @@ export class Slider {
   drawSlider() {
     d3.select('#slider-time').node().append(this.svg.node());
     d3.select('p#value-time').text(d3.timeFormat('%Y')(this.sliderTime.value()));
+    d3.select('g.parameter-value text').text('All Time');
   }
 }
