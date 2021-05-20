@@ -6,20 +6,17 @@
   <title>Data Visualization</title>
 </head>
 <body style="visibility: hidden">
-  <button type="button" onclick="openModal()" class="inline-flex items-center justify-center text-center fixed top-2 right-2 w-1.5 h-1.5 rounded-full shadow-sm hover:bg-gray-400 p-5 bg-gray-500">
-    <span class="text-lg font-medium text-white">i</span>
-  </button>
 
   <!-- TO DO: remove hidden in the end -->
   <div id="modal" class="fixed z-30 inset-0 overflow-y-auto hidden">
     <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
 
       <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"
-           onclick="closeModal()"></div>
+           onclick="hideElement('#modal')"></div>
       <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
       <div
-          class="rounded-md border bg-gray-50 inline-block align-bottom text-left overflow-hidden transform sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+          class="rounded-md border bg-gray-50 inline-block text-left overflow-hidden transform sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
         <div class=" px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
           <div class="sm:flex sm:items-start">
             <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
@@ -37,7 +34,7 @@
           </div>
         </div>
         <div class=" px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-          <button type="button" onclick="closeModal()" class="bg-gray-50 mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-white  sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+          <button type="button" onclick="hideElement('#modal')" class="bg-gray-50 mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-white  sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
             Start
           </button>
         </div>
@@ -46,10 +43,22 @@
   </div>
   <div class="h-screen">
     <div class="grid grid-cols-4 grid-rows-12 gap-4 h-full">
-      <div class="col-start-2 col-span-2 row-span-2 content-center z-10">
+      <div class="col-start-2 col-span-2 row-span-2 content-center z-10 relative">
+        <div onmouseenter="showElement('#slider-info')" onmouseleave="hideElement('#slider-info')" class="inline-flex items-center justify-center text-center absolute top-0 right-0 w-1 h-1 rounded-full shadow-sm hover:bg-gray-200 p-2.5 bg-gray-300">
+          <span class="text-sm font-medium text-white">i</span>
+        </div>
+        
         <div class="text-center"><p id="value-time"></p></div>
-        <div id="slider-time"></div>
+        <div class="w-full h-full" id="slider-time"></div>
       </div>
+      <div class="col-span-1 row-span-2 content-left relative"> 
+        <div class="rounded-md border bg-gray-50 absolute -left-3 top-4 w-5/6 p-3 hidden" id="slider-info">
+        <p class="text-sm"> The slider allows you to select a period of time in which papers were published on arXiv and this is reflected in the visualizations below.</p>
+        </div>
+        <button type="button" onclick="showElement('#modal')" class="inline-flex items-center justify-center text-center fixed top-2 right-2 w-1.5 h-1.5 rounded-full shadow-sm hover:bg-gray-400 p-4 bg-gray-500">
+          <span class="text-lg font-medium text-white">i</span>
+        </button>
+      </div> 
       <div class="col-span-2 row-span-6">
         <div id="categories-graph" class="w-full h-full"></div>
       </div>
@@ -86,15 +95,15 @@
 </body>
 </html>
 <script>
-  var modalClasses = document.querySelector('#modal').classList;
-  var hiddenClass = 'hidden';
-  function closeModal() {
-    if (!modalClasses.contains(hiddenClass))
-      modalClasses.add(hiddenClass);
+  var hiddenClass = 'hidden'; 
+  function hideElement(id) {
+    elementClasses = document.querySelector(id).classList;
+    if (!elementClasses.contains(hiddenClass))
+    elementClasses.add(hiddenClass);
   }
-
-  function openModal() {
-    if (modalClasses.contains(hiddenClass))
-      modalClasses.remove(hiddenClass);
+  function showElement(id) {
+    elementClasses = document.querySelector(id).classList;
+    if ( elementClasses.contains(hiddenClass))
+    elementClasses.remove(hiddenClass);
   }
 </script>

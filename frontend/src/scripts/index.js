@@ -12,7 +12,6 @@ if (process.env.NODE_ENV === 'development') { // Do not remove: used for hot rel
   require('../index.html');
 }
 
-makeBodyVisible();
 const fetchJson = filename => fetch(`public/data/${filename}`).then(response => response.json());
 
 Promise.all([
@@ -21,6 +20,7 @@ Promise.all([
   fetchJson('papers.json'),
   fetchJson('paper_counts.json'),
 ]).then(([graph, categoriesCounts, papers, paperCounts]) => {
+  makeBodyVisible();
   Object.keys(papers).forEach(key => {
     papers[key]['date'] = new Date(papers[key]['date']);
   });
@@ -52,3 +52,4 @@ Promise.all([
 
   });
 });
+
