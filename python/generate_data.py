@@ -118,6 +118,22 @@ def compute_abstracts_pca(df):
     # Final transformation (dense to 2D)
     return PCA(n_components=2).fit_transform(abstracts_svd)
 
+def merge_dicts(a, b, path=None):
+    """Borrowed from: https://stackoverflow.com/questions/7204805/how-to-merge-dictionaries-of-dictionaries"""
+    "merges b into a"
+    if path is None: path = []
+    for key in b:
+        if key in a:
+            if isinstance(a[key], dict) and isinstance(b[key], dict):
+                merge_dicts(a[key], b[key], path + [str(key)])
+            elif a[key] == b[key]:
+                pass # same leaf value
+            else:
+                raise Exception('Conflict at %s' % '.'.join(path + [str(key)]))
+        else:
+            a[key] = b[key]
+    return a
+
 
 def main():
     current_directory = os.path.dirname(os.path.abspath(__file__))
@@ -176,6 +192,22 @@ def main():
         "x": pca_locs[:, 0], "y": pca_locs[:, 1]
     })
     dump_json("papers.json", round_floats(selected_papers.to_dict("index"), 5))
+    
+    print("Calculating and writing paper counts...")
+    papers_expand = df.drop('categories', axis=1).join(df.categories.str.split(expand=True).stack().reset_index(drop=True, level=1).rename('categories'))
+    t_index = pd.DatetimeIndex(pd.date_range(start='2007', end='2021', freq="W"))
+    paper_counts = papers_expand.groupby('categories').apply(lambda x: x.resample('W', on='update_date').size().reindex(t_index).fillna(0).astype('int32'))
+    paper_counts = pd.DataFrame(paper_counts.stack()).reset_index()
+    paper_counts.columns = ["categories","date","count"]
+    paper_counts_all_temp = paper_counts.groupby("categories").apply(lambda x: {"date": x['date'].dt.strftime('%Y-%m-%d').tolist(), "count": x["count"].tolist()}).to_dict()
+    paper_counts_all = {}
+    for key, value in paper_counts_all_temp.items():
+        paper_counts_all[key] = {"all":value}
+    paper_counts = paper_counts.groupby(["categories",paper_counts.date.dt.year]).apply(lambda x: {"date": x['date'].dt.strftime('%Y-%m-%d').tolist(), "count": x["count"].tolist()})
+    paper_counts_years = {level: paper_counts.xs(level).to_dict() for level in paper_counts.index.levels[0]}
+    paper_counts_all = merge_dicts(paper_counts_all, paper_counts_years)
+
+    dump_json("paper_counts.json", paper_counts_all)
 
     print("All done.")
 
