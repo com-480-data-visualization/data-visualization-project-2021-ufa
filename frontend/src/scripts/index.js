@@ -34,18 +34,20 @@ Promise.all([
   slider.drawSlider();
   slider.sliderTime.on('end', val => {
     //document.querySelector('g.parameter-value text').innerHTML = val + 2007;
+    let currValue = 'all';
     let filteredPapers = papers;
     if (val != 14) {
+      currValue = val + 2007;
       filteredPapers = Object.keys(papers)
-        .filter(key => papers[key]['date'].getFullYear() == val + 2007)
+        .filter(key => papers[key]['date'].getFullYear() == currValue)
         .reduce((obj, key) => {
           obj[key] = papers[key];
           return obj;
         }, {});
     }
-    //console.log(val.getFullYear());
     document.getElementById('papers-cloud').innerHTML = '';
-    //drawGraph(graph[val.getFullYear()], categoriesCounts[val.getFullYear()]);
+    document.getElementById('categories-graph').innerHTML = '';
+    drawGraph(graph[currValue], categoriesCounts[currValue], paperCounts, currValue);
     drawCloud(filteredPapers);
 
   });
