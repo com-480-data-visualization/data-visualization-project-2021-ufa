@@ -5,26 +5,24 @@ import { CATEGORIES, categoriesColors, color, getCategoryIndexAndLabel } from '.
 import { linePlot } from './time';
 
 export const drawGraph = (graph, categoriesCounts) => {
+
+  const container = d3.select('#categories-graph');
+
+  const containerDom = container.node();
+  const aspect = containerDom.clientWidth / containerDom.clientHeight;
   const width = 1000;
-  const height = 800;
+  const height = width / aspect;
 
-  const filterEdges = (data, minEdge) => {
-    let links = data.links.filter(f => f.weight >= minEdge).map(d => Object.create(d));
-    let nodeSet = new Set();
-    links.forEach(item => {
-      nodeSet.add(item.source);
-      nodeSet.add(item.target);
-    });
-    return { links: links, nodes: [...nodeSet].map(d => Object.create({ id: d })) };
-  };
-  const filteredData = filterEdges(graph, 100);
+  const links = graph.links;
+  const nodes = graph.nodes;
 
-  const links = filteredData.links;
-  const nodes = filteredData.nodes;
-
+  const force = 0.1;
+  const charge = 150;
   const simulation = d3.forceSimulation(nodes)
     .force('link', d3.forceLink(links).id(d => d.id))
-    .force('charge', d3.forceManyBody().strength(-100))
+    .force('charge', d3.forceManyBody().strength(-charge))
+    .force('forceX', d3.forceX().strength(force / aspect))
+    .force('forceY', d3.forceY().strength(force * aspect))
     .force('center', d3.forceCenter(width / 2, height / 2));
 
   let selectedNode = null;
@@ -63,7 +61,7 @@ export const drawGraph = (graph, categoriesCounts) => {
       .slice(0, SIMILARITY_BAR_N);
 
     gNodes.classed('opacity-10', node ? d => !connectedSet.has(d.id) : false);
-    gLinks.classed('opacity-25', node ? d => d.source.id !== node.id && d.target.id !== node.id : false);
+    gLinks.classed('hidden', node ? d => d.source.id !== node.id && d.target.id !== node.id : false);
     d3.select('#categories-selected-category').text(node ? node.id : '-');
     d3.select('#categories-selected-field').text(node ? getCategoryIndexAndLabel(node.id).label : '-');
     d3.select('#categories-selected-count').text(node ? categoriesCounts[node.id].toLocaleString() : '-');
@@ -105,7 +103,7 @@ export const drawGraph = (graph, categoriesCounts) => {
 
   const svg = d3.create('svg')
     .attr('viewBox', [0, 0, width, height].join(' '))
-    .attr('class', 'max-w-full max-h-full');
+    .attr('class', 'max-w-full max-h-full overflow-visible');
 
   const gClusters = svg.append('g')
     .attr('font-weight', 'bold')
@@ -122,11 +120,11 @@ export const drawGraph = (graph, categoriesCounts) => {
     .attr('stroke', 'black')
     .attr('stroke-opacity', 0.5)
     .selectAll('line')
-    .data(links)
+    .data(links.filter(d => d.weight >= 100)) // Only display relevant edges
     .join('line')
     // Don't apply transition on already transparent objects, this is a serious bottleneck!
     //.attr('class', 'transition-opacity duration-250')
-    .attr('stroke-width', d => 0.00025 * d.weight);
+    .attr('stroke-width', d => 0.00025 * d.weight + 0.05);
 
   const gNodes = svg.append('g')
     .attr('stroke', '#fff')
@@ -198,7 +196,7 @@ export const drawGraph = (graph, categoriesCounts) => {
       updateHighlights();
     });*/
 
-  d3.select('#categories-graph').node().append(svg.node());
+  container.node().append(svg.node());
 
   //invalidation.then(() => simulation.stop());
 };

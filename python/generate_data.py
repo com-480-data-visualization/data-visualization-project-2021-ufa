@@ -84,7 +84,15 @@ def compute_graph(df):
                     adjacency[cat][cat_it] = {"weight": 1}
                 else:
                     adjacency[cat][cat_it]["weight"] += 1
+    # Keep only the relevant edges
+    min_weight = 25
+    for a in adjacency:
+        for b in list(adjacency[a]):
+            if adjacency[a][b]["weight"] < min_weight:
+                del adjacency[a][b]
     g = nx.Graph(adjacency)
+    # Keep only the largest connected component
+    g = g.subgraph(sorted(nx.connected_components(g), key=len, reverse=True)[0])
     return g
 
 
@@ -110,19 +118,6 @@ def compute_abstracts_pca(df):
     # Final transformation (dense to 2D)
     return PCA(n_components=2).fit_transform(abstracts_svd)
 
-def get_papers(n_papers,df,pca):
-    paper_indices = np.arange(len(df))
-    np.random.shuffle(paper_indices)
-    selected_paper_indices = paper_indices[:n_papers]
-    df_locs = df.iloc[selected_paper_indices]
-    pca_locs = np.take(pca, selected_paper_indices, axis=0)
-    selected_papers = pd.DataFrame({
-        #"title": df_locs.title,
-        "categories": df_locs.categories,
-        "x": pca_locs[:, 0], "y": pca_locs[:, 1]
-    })
-    return selected_papers
-
 
 def main():
     current_directory = os.path.dirname(os.path.abspath(__file__))
@@ -131,6 +126,16 @@ def main():
 
     assert os.path.isfile(path_input_file_arxiv)
     assert os.path.isdir(path_output_directory)
+
+    def round_floats(o, precision):
+        """Borrowed from: https://til.simonwillison.net/python/json-floating-point"""
+        if isinstance(o, float):
+            return round(o, precision)
+        if isinstance(o, dict):
+            return {k: round_floats(v, precision) for k, v in o.items()}
+        if isinstance(o, (list, tuple)):
+            return [round_floats(x, precision) for x in o]
+        return o
 
     def dump_json(filename, data):
         with open(os.path.join(path_output_directory, filename), "w") as f:
@@ -142,23 +147,23 @@ def main():
                            "df.pkl", serialize_dataframe, deserialize_dataframe)
 
     g = cached_or_compute(lambda: compute_graph(df),
-                          "categories_graph.pkl", serialize_network, deserialize_network)
+                          "categories_graph_connected.pkl", serialize_network, deserialize_network)
     year_graphs_series = df.groupby(df.update_date.dt.year).apply(lambda x: nx.readwrite.json_graph.node_link_data(compute_graph(x)))
-    all_graphs_series = year_graphs_series.append(pd.Series({"All":nx.readwrite.json_graph.node_link_data(g)}))
+    all_graphs_series = year_graphs_series.append(pd.Series({"all": nx.readwrite.json_graph.node_link_data(g)}))
     print("Writing categories graph data...")
 
     dump_json("categories_graph.json", all_graphs_series.to_dict())
 
     print("Writing categories counts...")
     year_categories_counts_series = df.groupby(df.update_date.dt.year).apply(compute_categories_counts)
-    all_categories_counts_series = year_categories_counts_series.append(pd.Series({"All":compute_categories_counts(df)}))
+    all_categories_counts_series = year_categories_counts_series.append(pd.Series({"all": compute_categories_counts(df)}))
     dump_json("categories_counts.json", all_categories_counts_series.to_dict())
 
     pca = cached_or_compute(lambda: compute_abstracts_pca(df),
                             "pca.npy", serialize_numpy, deserialize_numpy)
 
     print("Writing (a subset of) papers...")
-    n_papers = 10000
+    n_papers = 25000
     paper_indices = np.arange(len(df))
     np.random.shuffle(paper_indices)
     selected_paper_indices = paper_indices[:n_papers]
@@ -170,7 +175,7 @@ def main():
         "date": df_locs.update_date.astype(str),
         "x": pca_locs[:, 0], "y": pca_locs[:, 1]
     })
-    dump_json("papers.json", selected_papers.to_dict("index"))
+    dump_json("papers.json", round_floats(selected_papers.to_dict("index"), 5))
 
     print("All done.")
 

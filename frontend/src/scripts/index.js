@@ -23,13 +23,12 @@ Promise.all([
   Object.keys(papers).forEach(key => {
     papers[key]['date'] = new Date(papers[key]['date']);
   });
-  drawGraph(graph['All'], categoriesCounts['All']);
+  drawGraph(graph['all'], categoriesCounts['all']);
   drawCloud(papers);
   barPlot();
   linePlot();
 
 
-  console.log(papers);
   let slider = new Slider();
   slider.drawSlider();
   slider.sliderTime.on('end', val => {

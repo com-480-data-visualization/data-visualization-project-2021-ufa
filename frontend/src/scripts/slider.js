@@ -6,7 +6,7 @@ export class Slider {
     this.dataTime = d3.range(0, 15).map(d => new Date(2007 + d, 10, 3));
     let dataTimeTicks = this.dataTime.map(d => d.getFullYear().toString());
     dataTimeTicks[dataTimeTicks.length - 1] = 'All Time';
-    console.log(dataTimeTicks);
+
     this.sliderTime = sliderBottom()
       .min(0)
       .max(14)
