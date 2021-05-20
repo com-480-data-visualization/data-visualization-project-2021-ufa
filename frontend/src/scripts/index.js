@@ -19,11 +19,12 @@ Promise.all([
   fetchJson('categories_graph.json'),
   fetchJson('categories_counts.json'),
   fetchJson('papers.json'),
-]).then(([graph, categoriesCounts, papers]) => {
+  fetchJson('paper_counts.json'),
+]).then(([graph, categoriesCounts, papers, paperCounts]) => {
   Object.keys(papers).forEach(key => {
     papers[key]['date'] = new Date(papers[key]['date']);
   });
-  drawGraph(graph['all'], categoriesCounts['all']);
+  drawGraph(graph['all'], categoriesCounts['all'], paperCounts, 'all');
   drawCloud(papers);
   barPlot();
   linePlot();

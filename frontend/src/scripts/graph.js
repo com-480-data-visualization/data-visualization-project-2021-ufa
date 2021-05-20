@@ -4,7 +4,7 @@ import { SIMILARITY_BAR_N, barPlot } from './bar';
 import { CATEGORIES, categoriesColors, color, getCategoryIndexAndLabel } from './common';
 import { linePlot } from './time';
 
-export const drawGraph = (graph, categoriesCounts) => {
+export const drawGraph = (graph, categoriesCounts, paperCounts, paperCountsDate) => {
 
   const container = d3.select('#categories-graph');
 
@@ -48,11 +48,10 @@ export const drawGraph = (graph, categoriesCounts) => {
           connectedWeights.push({ id: neighbour, weight: l.weight });
         }
       });
-
       // Line data (MOCK)
-      const items = [0, 10, 40, 50, 95, 120];
-      const date = [[2007, 3, 23], [2007, 3, 24], [2007, 3, 25], [2007, 3, 26], [2007, 3, 29], [2007, 4, 1]];
-      items.forEach((item, i) => (dataLine.push({ date: new Date(date[i][0], date[i][1], date[i][2]), value: item })));
+      const items = paperCounts[node.id][paperCountsDate]['count'];
+      const date = paperCounts[node.id][paperCountsDate]['date'];
+      items.forEach((item, i) => (dataLine.push({ date: new Date(date[i]), value: item })));
     }
     const weightSum = connectedWeights.map(({ weight }) => weight).reduce((a, b) => a + b, 0);
     const connectedWeightRatios = connectedWeights
