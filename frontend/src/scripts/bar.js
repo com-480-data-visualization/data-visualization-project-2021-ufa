@@ -19,11 +19,19 @@ export const barPlot = (dataBar = []) => {
     .domain(dataBar.map(d => d.id))
     .padding(0.2);
   svgBar.append('g')
-    .attr('transform', 'translate(0,' + heightChart + ')')
+    .attr('transform', `translate(0,${heightChart})`)
     .call(d3.axisBottom(x))
     .selectAll('text')
     .attr('transform', 'translate(-10,0)rotate(-45)')
     .style('text-anchor', 'end');
+
+  svgBar.append('text')             
+    .attr('transform',
+          'translate(' +(-2*margin.left/3) + ',' + (heightChart+margin.bottom/2)+')rotate(-45)')
+    .style("text-anchor", "middle")
+    .style("font-weight", "bold")
+    .style("font-size", "70%")
+    .text("categories");
 
   // Add Y axis
   let y = d3.scaleLinear()
@@ -31,6 +39,15 @@ export const barPlot = (dataBar = []) => {
     .range([heightChart, 0]);
   svgBar.append('g')
     .call(d3.axisLeft(y));
+
+  svgBar.append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("x",0 - (heightChart / 2))
+    .attr("y", 0 - 2*margin.left/3)
+    .style("font-weight", "bold")
+    .style("font-size", "70%")
+    .style("text-anchor", "middle")
+    .text("weight ratios");      
 
   // Bars
   svgBar.selectAll('mybar')

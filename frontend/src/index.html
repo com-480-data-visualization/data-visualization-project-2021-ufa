@@ -44,7 +44,7 @@
   <div class="h-screen">
     <div class="grid grid-cols-4 grid-rows-12 gap-4 h-full">
       <div class="col-start-2 col-span-2 row-span-2 content-center z-10 relative">
-        <div onmouseenter="showElement('#slider-info')" onmouseleave="hideElement('#slider-info')" class="inline-flex items-center justify-center text-center absolute top-0 right-0 w-1 h-1 rounded-full shadow-sm hover:bg-gray-200 p-2.5 bg-gray-300">
+        <div onmouseenter="showElement('#slider-info')" onmouseleave="hideElement('#slider-info')" class="inline-flex items-center justify-center text-center absolute top-0 right-0 w-1 h-1 rounded-full shadow-sm hover:bg-gray-200 p-2.5 bg-gray-300 select-none cursor-pointer">
           <span class="text-sm font-medium text-white">i</span>
         </div>
         
@@ -59,10 +59,28 @@
           <span class="text-lg font-medium text-white">i</span>
         </button>
       </div> 
-      <div class="col-span-2 row-span-6">
+      <div class="col-span-2 row-span-6 relative text-center ">
+        <div class="inline-flex relative"> 
+          <h3 class="font-bold"> Graph of paper categories </h3> 
+          <div onmouseenter="showElement('#categories-graph-info')" onmouseleave="hideElement('#categories-graph-info')" class="inline-flex items-center justify-center text-center w-1 h-1 rounded-full shadow-sm hover:bg-gray-200 p-2.5 bg-gray-300 select-none cursor-pointer ml-3 mt-0.5">
+            <span class="text-sm font-medium text-white">i</span>
+          </div>
+            <div class="rounded-md border bg-gray-50 absolute -right-full top-6 w-full p-3 hidden" id="categories-graph-info">
+              <p class="text-sm"> This is a weighted graph of all categories of papers in the arXiv database. The edges are proportional to the number of papers having the two categories at the same time. You can <span class="font-bold"> click </span> and <span class="font-bold"> drag</span> the nodes. When you click or hover a node you can see the adjacent categories and additional statistics below.</p>
+            </div>
+        </div>
         <div id="categories-graph" class="w-full h-full"></div>
       </div>
-      <div class="col-span-2 row-span-6 overflow-hidden relative">
+      <div class="col-span-2 row-span-6 overflow-hidden text-center relative">
+        <div class="inline-flex relative"> 
+          <h3 class="font-bold"> Cloud of papers </h3> 
+          <div onmouseenter="showElement('#papers-cloud-info')" onmouseleave="hideElement('#papers-cloud-info')" class="inline-flex items-center justify-center text-center w-1 h-1 rounded-full shadow-sm hover:bg-gray-200 p-2.5 bg-gray-300 select-none cursor-pointer ml-3 mt-0.5">
+            <span class="text-sm font-medium text-white">i</span>
+          </div>
+          <div class="rounded-md border bg-gray-50 absolute -right-full top-6 w-full p-3 hidden" id="papers-cloud-info">
+            <p class="text-sm"> Each point represents a paper which you can either <span class="font-bold"> click </span> on to reveal its name and categories or <span class="font-bold"> search </span> in the bar below to discover its position. The cloud was built using PCA on the title/abstract. </p>
+          </div>
+        </div>
         <div id="cloud-tooltip" class="absolute w-min left-1/2 top-1/2 hidden" style="transform: translate(-50%, -120%)">
           <div class="bg-black text-white text-sm rounded py-1 px-4 right-0 bottom-full text-center max-w-xl">
             <a href="#" target="_blank" id="cloud-tooltip-link" class="block whitespace-nowrap underline"></a>

@@ -24,8 +24,7 @@ export const linePlot = (dataLine = [], lineColor = '') => {
   let xAxis = g => g
     .attr('transform', `translate(0,${heightChart + margin.top})`)
     .call(d3.axisBottom(x).ticks(widthChart / 80));
-
-
+  
   let y = d3.scaleLinear()
     .domain([0, d3.max(dataLine, d => d.value)]).nice()
     .range([heightChart, 0]);
@@ -42,9 +41,28 @@ export const linePlot = (dataLine = [], lineColor = '') => {
 
   svg.append('g')
     .call(xAxis);
+  
+  svg.append("text")             
+    .attr("transform",
+          "translate(" + (widthChart/2 + margin.left) + " ," + 
+                         (heightChart + margin.top + margin.bottom/2) + ")")
+    .style("text-anchor", "middle")
+    .style("font-weight", "bold")
+    .style("font-size", "70%")
+    .text("date");
 
+  
   svg.append('g')
     .call(yAxis);
+  
+  svg.append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("x",0 - (heightChart / 2))
+    .attr("y", 0)
+    .style("font-weight", "bold")
+    .style("font-size", "70%")
+    .style("text-anchor", "middle")
+    .text("#papers"); 
 
   let path = svg.append('path')
     .datum(dataLine)
