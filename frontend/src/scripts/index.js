@@ -26,7 +26,7 @@ Promise.all([
   });
   drawGraph(graph['all'], categoriesCounts['all'], paperCounts, 'all');
   drawCloud(papers);
-  barPlot();
+  barPlot.draw();
   linePlot();
 
 

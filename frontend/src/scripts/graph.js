@@ -65,7 +65,7 @@ export const drawGraph = (graph, categoriesCounts, paperCounts, paperCountsDate)
     d3.select('#categories-selected-field').text(node ? getCategoryIndexAndLabel(node.id).label : '-');
     d3.select('#categories-selected-count').text(node ? categoriesCounts[node.id].toLocaleString() : '-');
 
-    barPlot(connectedWeightRatios);
+    barPlot.draw(connectedWeightRatios);
     linePlot(dataLine, node ? color(node) : '');
   };
 
