@@ -2,11 +2,39 @@ import * as THREE from 'three';
 import * as d3 from 'd3';
 import * as seedrandom from 'seedrandom';
 import { getPaperMetadata, urlForPaper } from './api';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 // eslint-disable-next-line sort-imports
 import { CATEGORIES, color, getCategoryIndexAndLabel } from './common';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
+
+const RectangleVignetteFilter = {
+  uniforms: {
+    'tDiffuse': { value: null },
+    'color': { value: new THREE.Color(1.0, 0.9921, 0.9607) },
+  },
+  vertexShader: [
+    'varying vec2 vUv;',
+    'void main() {',
+    '  vUv = uv;',
+    '  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);',
+    '}',
+  ].join('\n'),
+  fragmentShader: [
+    'uniform sampler2D tDiffuse;',
+    'uniform vec3 color;',
+    'varying vec2 vUv;',
+    'void main() {',
+    '  vec4 texel = texture2D(tDiffuse, vUv);',
+    '  vec2 p = vUv * 2.0 - 1.0;',
+    '  float b = 5.0;',
+    '  float d = clamp(b * (1.0 - abs(p.x)), 0.0, 1.0) * clamp(b * (1.0 - abs(p.y)), 0.0, 1.0);',
+    '  gl_FragColor.xyz = texel.xyz * d + color.xyz * (1.0 - d);',
+    '}',
+  ].join('\n'),
+};
 
 export const drawCloud = papers => {
-
   const domContainer = document.getElementById('papers-cloud');
   const containerAspect = domContainer.clientWidth / domContainer.clientHeight;
   const aspect = containerAspect; // If we need to fix the aspect, change this value
@@ -21,6 +49,14 @@ export const drawCloud = papers => {
   renderer.setSize(width, height);
   renderer.domElement.classList.add('m-auto');
   domContainer.appendChild(renderer.domElement);
+
+  const composer = new EffectComposer(renderer);
+  composer.setSize(width, height);
+  const renderPass = new RenderPass(scene, camera);
+  composer.addPass(renderPass);
+  const vignettePass = new ShaderPass(RectangleVignetteFilter);
+  vignettePass.renderToScreen = true;
+  composer.addPass(vignettePass);
 
   const squareSize = 0.004;
   const geometry = new THREE.PlaneGeometry(squareSize, squareSize);
@@ -65,7 +101,7 @@ export const drawCloud = papers => {
   let selectedObject = null;
 
   const render = () => {
-    renderer.render(scene, camera);
+    composer.render();
     const c = 0.2;
     if (selectedObject !== null) {
       camera.position.x += (selectedObject.position.x - camera.position.x) * c;
