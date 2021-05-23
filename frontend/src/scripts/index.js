@@ -1,11 +1,11 @@
 import '../styles/index.scss';
 import 'tailwindcss/tailwind.css';
 import '@fontsource/poppins';
+import { BarPlot } from './bar';
+import { Cloud } from './cloud';
+import { Graph } from './graph';
+import { LinePlot } from './time';
 import { Slider } from './slider';
-import { barPlot } from './bar';
-import { drawCloud } from './cloud';
-import { drawGraph } from './graph';
-import { linePlot } from './time';
 import { makeBodyVisible } from './visibleBody';
 
 if (process.env.NODE_ENV === 'development') { // Do not remove: used for hot reload
@@ -24,10 +24,18 @@ Promise.all([
   Object.keys(papers).forEach(key => {
     papers[key]['date'] = new Date(papers[key]['date']);
   });
-  drawGraph(graph['all'], categoriesCounts['all'], paperCounts, 'all');
-  drawCloud(papers);
+
+  const catGraph = new Graph();
+  const cloud = new Cloud();
+  const barPlot = new BarPlot();
+  const linePlot = new LinePlot();
+
+  catGraph.initialize(barPlot, linePlot);
+
+  catGraph.draw(graph['all'], categoriesCounts['all'], paperCounts, 'all');
+  cloud.draw(papers);
   barPlot.draw();
-  linePlot();
+  linePlot.draw();
 
 
   let slider = new Slider();
@@ -47,8 +55,8 @@ Promise.all([
     }
     document.getElementById('papers-cloud').innerHTML = '';
     document.getElementById('categories-graph').innerHTML = '';
-    drawGraph(graph[currValue], categoriesCounts[currValue], paperCounts, currValue);
-    drawCloud(filteredPapers);
+    catGraph.draw(graph[currValue], categoriesCounts[currValue], paperCounts, currValue);
+    cloud.draw(filteredPapers);
 
   });
 });

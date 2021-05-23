@@ -4,7 +4,7 @@ import { color, heightChart, margin, widthChart } from './common';
 export const SIMILARITY_BAR_N = 5;
 
 
-class BarPlot {
+export class BarPlot {
 
   constructor() {
     this.dataBar = [];
@@ -23,6 +23,10 @@ class BarPlot {
       .range([0, widthChart])
       .domain(this.dataBar.map(d => d.id))
       .padding(0.2);
+
+    this.svgBar.append('g')
+      .attr('transform', `translate(0,${heightChart})`)
+      .call(d3.axisBottom(this.x));
 
     // X axis label
     this.svgBar.append('text')
@@ -65,6 +69,7 @@ class BarPlot {
     this.svgBar.append('g')
       .attr('transform', `translate(0,${heightChart})`)
       .call(d3.axisBottom(this.x))
+      .call(g => g.select('.domain').remove())
       .selectAll('text')
       .classed('axis-bottom-text', true)
       .attr('transform', 'translate(-10,0)rotate(-45)')
@@ -94,4 +99,3 @@ class BarPlot {
   }
 }
 
-export const barPlot = new BarPlot();
