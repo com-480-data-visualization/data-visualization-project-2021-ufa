@@ -7,7 +7,7 @@ export class LinePlot {
   constructor() {
   }
 
-  draw(dataLine = [], lineColor = '') {
+  update(dataLine = [], lineColor = '') {
 
     d3.select('#published-line').select('svg').remove();
 

@@ -15,6 +15,7 @@ export class Graph {
     this.width = 1000;
     this.height = this.width / this.aspect;
 
+    this.simulation = null;
   }
 
   initialize(barPlot, linePlot) {
@@ -22,7 +23,10 @@ export class Graph {
     this.barPlot = barPlot;
   }
 
-  draw(graph, categoriesCounts, paperCounts, paperCountsDate) {
+  update(graph, categoriesCounts, paperCounts, paperCountsDate) {
+    if (this.simulation) { // Cancel previous simulation, if any
+      this.simulation.stop();
+    }
 
     this.container.selectAll('*').remove();
 
@@ -35,7 +39,7 @@ export class Graph {
 
     const force = 0.1;
     const charge = 150;
-    const simulation = d3.forceSimulation(nodes)
+    this.simulation = d3.forceSimulation(nodes)
       .force('link', d3.forceLink(links).id(d => d.id))
       .force('charge', d3.forceManyBody().strength(-charge))
       .force('forceX', d3.forceX().strength(force / this.aspect))
@@ -83,8 +87,8 @@ export class Graph {
       d3.select('#categories-selected-field').text(node ? getCategoryIndexAndLabel(node.id).label : '-');
       d3.select('#categories-selected-count').text(node ? categoriesCounts[node.id].toLocaleString() : '-');
 
-      this.barPlot.draw(connectedWeightRatios);
-      this.linePlot.draw(dataLine, node ? color(node) : '');
+      this.barPlot.update(connectedWeightRatios);
+      this.linePlot.update(dataLine, node ? color(node) : '');
     };
 
     const drag = simulation => {
@@ -151,7 +155,7 @@ export class Graph {
       .attr('class', 'transition-opacity duration-250')
       .attr('r', d => Math.log(categoriesCounts[d.id]) * 0.7)
       .attr('fill', color)
-      .call(drag(simulation));
+      .call(drag(this.simulation));
 
     gNodes.append('title')
       .text(d => {
@@ -159,7 +163,7 @@ export class Graph {
         return `${d.id} (${label})`;
       });
 
-    simulation.on('tick', () => {
+    this.simulation.on('tick', () => {
       const clampX = x => Math.max(0, Math.min(this.width, x));
       const clampY = y => Math.max(0, Math.min(this.height, y));
 
@@ -188,8 +192,9 @@ export class Graph {
       };
       const aggregated = Object.fromEntries(Object.entries(groups).map(([index, nodesIn]) => [index, mean(nodesIn)]));
       gClusters
-        .attr('x', d => aggregated[d.index].x)
-        .attr('y', d => aggregated[d.index].y);
+        .classed('hidden', d => !aggregated[d.index])
+        .attr('x', d => aggregated[d.index] && aggregated[d.index].x)
+        .attr('y', d => aggregated[d.index] && aggregated[d.index].y);
     });
 
     gNodes

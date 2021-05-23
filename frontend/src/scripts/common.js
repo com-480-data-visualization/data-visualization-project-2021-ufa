@@ -68,3 +68,5 @@ export const color = d => {
   const { index } = getCategoryIndexAndLabel(d.id);
   return categoriesColors[index];
 };
+
+export const ALL = 'all';

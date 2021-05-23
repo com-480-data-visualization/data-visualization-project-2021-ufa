@@ -5,7 +5,7 @@ import { getPaperMetadata, urlForPaper } from './api';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 // eslint-disable-next-line sort-imports
-import { CATEGORIES, color, getCategoryIndexAndLabel } from './common';
+import { ALL, CATEGORIES, color, getCategoryIndexAndLabel } from './common';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 
 const RectangleVignetteFilter = {
@@ -37,20 +37,18 @@ const RectangleVignetteFilter = {
 
 export class Cloud {
 
-  constructor() {
+  constructor(papers) {
     this.domContainer = document.getElementById('papers-cloud');
     const containerAspect = this.domContainer.clientWidth / this.domContainer.clientHeight;
     this.aspect = containerAspect; // If we need to fix the aspect, change this value
     this.width = containerAspect < this.aspect ? this.domContainer.clientWidth : this.domContainer.clientHeight * this.aspect;
     this.height = this.width / this.aspect;
 
-    this.tooltip = d3.select('#cloud-tooltip'), this.tooltipLink = d3.select('#cloud-tooltip-link'),
-    this.tooltipDescription = d3.select('#cloud-tooltip-description'),
+    this.tooltip = d3.select('#cloud-tooltip');
+    this.tooltipLink = d3.select('#cloud-tooltip-link');
+    this.tooltipDescription = d3.select('#cloud-tooltip-description');
     this.tooltipCategories = d3.select('#cloud-tooltip-categories');
 
-  }
-
-  draw(papers) {
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(10, this.aspect, 0.1, 10);
     this.initialScale = 2;
@@ -76,20 +74,24 @@ export class Cloud {
       //opacity: 0.8,
       //side: THREE.DoubleSide,
     }));
+
     this.parentContainer = new THREE.Object3D();
     this.scene.add(this.parentContainer);
 
     this.scene.background = new THREE.Color('#fffdf5');
 
-
-
     let bbMin = new THREE.Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE), bbMax = bbMin.clone().negate();
-    Object.entries(papers).slice(0, 2500).forEach(([id, { categories, x, y }]) => {
+    Object.entries(papers).forEach(([id, { categories, x, y, date }]) => {
       const categoriesList = categories.split(' ');
       const firstCategory = categoriesList[0];
       const categoryIndex = getCategoryIndexAndLabel(firstCategory).index;
       const particle = new THREE.Mesh(this.geometry, this.materials[categoryIndex]);
-      this.parentContainer.add(particle);
+      const year = new Date(date).getFullYear();
+
+      const particleObject = new THREE.Object3D();
+      particleObject.visible = false; // Hidden by default
+      particleObject.add(particle);
+      this.parentContainer.add(particleObject);
 
       // Randomize the z-coordinates for depth effect (without affecting the data)
       const zRange = 0.2;
@@ -98,23 +100,13 @@ export class Cloud {
       particle.position.y = y;
 
       // Custom properties
-      particle.userData = { id, categories: categoriesList };
+      particle.userData = { id, categories: categoriesList, year };
 
       bbMin.min(particle.position);
       bbMax.max(particle.position);
     });
 
-    let selectedObject = null;
-
-    const render = () => {
-      this.composer.render();
-      const c = 0.2;
-      if (selectedObject !== null) {
-        this.camera.position.x += (selectedObject.position.x - this.camera.position.x) * c;
-        this.camera.position.y += (selectedObject.position.y - this.camera.position.y) * c;
-      }
-      requestAnimationFrame(render);
-    };
+    this.selectedObject = null;
 
     const minScale = 0.5, maxScale = 4;
     bbMin.setZ(minScale);
@@ -125,7 +117,7 @@ export class Cloud {
     // Direction was inverted
       .wheelDelta(event => event.deltaY * (event.deltaMode === 1 ? 0.05 : event.deltaMode ? 1 : 0.002))
       .on('zoom', event => {
-        selectedObject = null;
+        this.selectedObject = null;
         this.tooltip.classed('hidden', true);
 
         if (event.sourceEvent) {
@@ -162,8 +154,8 @@ export class Cloud {
     const raycaster = new THREE.Raycaster();
 
     d3.select(this.renderer.domElement).on('click', e => {
-      const previousSelected = selectedObject;
-      selectedObject = null;
+      const previousSelected = this.selectedObject;
+      this.selectedObject = null;
 
       const bounds = this.renderer.domElement.getBoundingClientRect();
       const mouse = { x: ((e.clientX - bounds.left) / this.width) * 2 - 1, y: -((e.clientY - bounds.top) / this.height) * 2 + 1 };
@@ -171,25 +163,25 @@ export class Cloud {
       const intersections = raycaster.intersectObjects(this.scene.children, true);
       if (intersections.length > 0) {
         const intersection = intersections[0];
-        selectedObject = intersection.object;
+        this.selectedObject = intersection.object;
 
-        const id = selectedObject.userData.id;
+        const id = this.selectedObject.userData.id;
 
-        if (selectedObject !== previousSelected) {
+        if (this.selectedObject !== previousSelected) {
           this.tooltip.classed('hidden', false);
           this.tooltipLink.text(id).attr('href', urlForPaper(id));
           this.tooltipDescription.text('...');
           this.tooltipCategories.text('...');
 
           getPaperMetadata(id).then(xml => {
-            if (selectedObject !== null && selectedObject.userData.id === id) { // Verify that the object is still selected
+            if (this.selectedObject !== null && this.selectedObject.userData.id === id) { // Verify that the object is still selected
               const entry = xml.querySelector('feed > entry');
               const title = entry.querySelector('title');
               this.tooltipDescription.text(title.textContent);
               this.tooltipCategories.html(null);
               this.tooltipCategories
                 .selectAll('span')
-                .data(selectedObject.userData.categories)
+                .data(this.selectedObject.userData.categories)
                 .enter()
                 .append('span')
                 .text(d => d)
@@ -204,8 +196,36 @@ export class Cloud {
       }
     });
 
+
+    const render = () => {
+      this.composer.render();
+      const c = 0.2;
+      if (this.selectedObject !== null) {
+        this.camera.position.x += (this.selectedObject.position.x - this.camera.position.x) * c;
+        this.camera.position.y += (this.selectedObject.position.y - this.camera.position.y) * c;
+      }
+      requestAnimationFrame(render);
+    };
+
     // Start render loop
     render();
+  }
+
+  update(year = ALL) {
+    this.tooltip.classed('hidden', true);
+
+    const maxPointsShown = 2500;
+    let shown = 0;
+    const particles = this.parentContainer.children;
+    for (let i = 0; i < particles.length; i++) {
+      const particleObject = particles[i];
+      const particle = particleObject.children[0];
+      const visible = shown < maxPointsShown && (year === ALL || particle.userData.year === year);
+      particleObject.visible = visible;
+      if (visible) {
+        shown++;
+      }
+    }
   }
 }
 

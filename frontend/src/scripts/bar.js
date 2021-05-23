@@ -53,7 +53,7 @@ export class BarPlot {
       .text('weight ratios');
   }
 
-  draw(dataBar = []) {
+  update(dataBar = []) {
     this.dataBar = dataBar;
 
     this.svgBar.selectAll('mybar').remove();
