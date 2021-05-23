@@ -68,6 +68,18 @@
               <p class="text-sm">This is a weighted graph of all categories of papers in the arXiv database. The edges are proportional to the number of papers having the two categories at the same time. You can <span class="font-bold">click</span> and <span class="font-bold">drag</span> the nodes. When you click or hover a node you can see the adjacent categories and additional statistics below.</p>
             </div>
         </div>
+        <div id="graph-tooltip" class="absolute w-min pointer-events-none hidden" style="transform: translate(-50%, -80%)">
+          <div class="bg-black text-white text-sm rounded py-1 px-4 right-0 bottom-full text-center max-w-xl">
+            <span id="categories-selected-category" class="block whitespace-nowrap overflow-hidden overflow-ellipsis text-glow"></span>
+            <span id="categories-selected-field" class="block whitespace-nowrap overflow-hidden overflow-ellipsis font-bold"></span>
+            <span class="block whitespace-nowrap overflow-hidden overflow-ellipsis">
+              <span id="categories-selected-count"></span>
+              papers
+            </span>
+            <svg class="absolute text-black h-2 w-full left-0 top-full" x="0px" y="0px" viewBox="0 0 255 255"
+                 xml:space="preserve"><polygon class="fill-current" points="0,0 127.5,127.5 255,0"/></svg>
+          </div>
+        </div>
         <div id="categories-graph" class="w-full h-full table-row"></div>
       </div>
       <div class="col-span-2 row-span-6 overflow-hidden text-center relative table h-full">
@@ -83,7 +95,7 @@
         <div id="cloud-tooltip" class="absolute w-min left-1/2 top-1/2 hidden" style="transform: translate(-50%, -120%)">
           <div class="bg-black text-white text-sm rounded py-1 px-4 right-0 bottom-full text-center max-w-xl">
             <a href="#" target="_blank" id="cloud-tooltip-link" class="block whitespace-nowrap underline"></a>
-            <span id="cloud-tooltip-description" class="block whitespace-nowrap overflow-hidden overflow-ellipsis"></span>
+            <span id="cloud-tooltip-description" class="block whitespace-nowrap overflow-hidden overflow-ellipsis font-bold"></span>
             <span id="cloud-tooltip-categories" class="block whitespace-nowrap overflow-hidden overflow-ellipsis"></span>
             <svg class="absolute text-black h-2 w-full left-0 top-full" x="0px" y="0px" viewBox="0 0 255 255"
                  xml:space="preserve"><polygon class="fill-current" points="0,0 127.5,127.5 255,0"/></svg>
@@ -91,22 +103,8 @@
         </div>
         <div id="papers-cloud" class="w-full h-full table-row"></div>
       </div>
-      <div class="col-start-1 col-span-1 row-span-4 overflow-hidden text-center">
-        <div>
-          Category:
-          <span id="categories-selected-category" class="font-bold">-</span>
-        </div>
-        <div>
-          Field:
-          <span id="categories-selected-field" class="font-bold">-</span>
-        </div>
-        <div>
-          Papers:
-          <span id="categories-selected-count" class="font-bold">-</span>
-        </div>
-      </div>
-      <div id="similar-bar" class="col-start-2 col-span-1 row-span-4 w-full h-full overflow-hidden"></div>
-      <div id="published-line" class="col-start-3 col-span-1 row-span-4 w-full h-full overflow-hidden"></div>
+      <div id="similar-bar" class="col-span-1 row-span-4 w-full h-full overflow-hidden"></div>
+      <div id="published-line" class="col-span-1 row-span-4 w-full h-full overflow-hidden"></div>
     </div>
   </div>
 </body>

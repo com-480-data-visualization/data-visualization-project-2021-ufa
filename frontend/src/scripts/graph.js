@@ -49,9 +49,9 @@ export class Graph {
     let selectedNode = null;
     let hoveredNode = null;
 
+    const tooltip = d3.select('#graph-tooltip');
 
     const updateHighlights = () => {
-
       const node = selectedNode || hoveredNode;
       const connectedSet = new Set();
       const connectedWeights = [];
@@ -70,7 +70,7 @@ export class Graph {
             connectedWeights.push({ id: neighbour, weight: l.weight });
           }
         });
-        // Line data (MOCK)
+
         const items = paperCounts[node.id][paperCountsDate]['count'];
         const date = paperCounts[node.id][paperCountsDate]['date'];
         items.forEach((item, i) => (dataLine.push({ date: new Date(date[i]), value: item })));
@@ -83,16 +83,18 @@ export class Graph {
 
       gNodes.classed('opacity-10', node ? d => !connectedSet.has(d.id) : false);
       gLinks.classed('hidden', node ? d => d.source.id !== node.id && d.target.id !== node.id : false);
-      d3.select('#categories-selected-category').text(node ? node.id : '-');
-      d3.select('#categories-selected-field').text(node ? getCategoryIndexAndLabel(node.id).label : '-');
-      d3.select('#categories-selected-count').text(node ? categoriesCounts[node.id].toLocaleString() : '-');
+      d3.select('#categories-selected-category').text(node && node.id).style('color', node && color(node));
+      d3.select('#categories-selected-field').text(node && getCategoryIndexAndLabel(node.id).label);
+      d3.select('#categories-selected-count').text(node && categoriesCounts[node.id].toLocaleString());
+
+      tooltip.classed('hidden', !node);
 
       this.barPlot.update(connectedWeightRatios);
       this.linePlot.update(dataLine, node ? color(node) : '');
     };
 
+    // eslint-disable-next-line no-unused-vars
     const drag = simulation => {
-
       function dragstarted(event) {
         if (!event.active) simulation.alphaTarget(0.3).restart();
         event.subject.fx = event.subject.x;
@@ -155,13 +157,17 @@ export class Graph {
       .attr('class', 'transition-opacity duration-250')
       .attr('r', d => Math.log(categoriesCounts[d.id]) * 0.7)
       .attr('fill', color)
-      .call(drag(this.simulation));
+      ;//.call(drag(this.simulation));
 
-    gNodes.append('title')
-      .text(d => {
-        const label = getCategoryIndexAndLabel(d.id).label;
-        return `${d.id} (${label})`;
-      });
+    const updateTooltipPosition = () => {
+      const node = hoveredNode;
+      if (node) {
+        const containerDom = this.container.node();
+        tooltip
+          .style('top', (node.y / this.height * containerDom.clientHeight) + 'px')
+          .style('left', (node.x / this.width * containerDom.clientWidth) + 'px');
+      }
+    };
 
     this.simulation.on('tick', () => {
       const clampX = x => Math.max(0, Math.min(this.width, x));
@@ -195,11 +201,15 @@ export class Graph {
         .classed('hidden', d => !aggregated[d.index])
         .attr('x', d => aggregated[d.index] && aggregated[d.index].x)
         .attr('y', d => aggregated[d.index] && aggregated[d.index].y);
+
+      // Tooltip
+      updateTooltipPosition();
     });
 
     gNodes
       .on('mouseover', (_, d) => {
         hoveredNode = d;
+        updateTooltipPosition();
         if (!selectedNode) { // Avoid expensive updates
           updateHighlights();
         }
