@@ -17,7 +17,6 @@
     "camelcase": "warn",
     "max-len": ["warn", { "code": 160 }],
     "no-duplicate-imports": "warn",
-    "sort-imports": "warn",
     "comma-spacing": "warn",
     "array-bracket-spacing": "warn",
     "no-useless-return": "warn",

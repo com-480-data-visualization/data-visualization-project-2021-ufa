@@ -16,11 +16,11 @@ if (process.env.NODE_ENV === 'development') { // Do not remove: used for hot rel
 const fetchJson = filename => fetch(`public/data/${filename}`).then(response => response.json());
 
 Promise.all([
-  fetchJson('categories_graph.json'),
-  fetchJson('categories_counts.json'),
-  fetchJson('papers.json'),
-  fetchJson('paper_counts.json'),
-]).then(([graph, categoriesCounts, papers, paperCounts]) => {
+  'categories_graph.json',
+  'categories_counts.json',
+  'papers.json',
+  'paper_counts.json',
+].map(fetchJson)).then(([graph, categoriesCounts, papers, paperCounts]) => {
   makeBodyVisible();
 
   let minYear = null, maxYear = null;
@@ -53,10 +53,8 @@ Promise.all([
   slider.sliderTime.on('end', val => {
     const year = val === slider.tickAllTime ? ALL : val;
 
-    console.log(year);
-
     catGraph.update(graph[year], categoriesCounts[year], paperCounts, year);
-    cloud.update(year); // FIXME
+    cloud.update(year);
   });
 });
 

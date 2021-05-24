@@ -4,7 +4,6 @@ import * as seedrandom from 'seedrandom';
 import { getPaperMetadata, urlForPaper } from './api';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
-// eslint-disable-next-line sort-imports
 import { ALL, CATEGORIES, color, getCategoryIndexAndLabel } from './common';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 
@@ -88,10 +87,8 @@ export class Cloud {
       const particle = new THREE.Mesh(this.geometry, this.materials[categoryIndex]);
       const year = new Date(date).getFullYear();
 
-      const particleObject = new THREE.Object3D();
-      particleObject.visible = false; // Hidden by default
-      particleObject.add(particle);
-      this.parentContainer.add(particleObject);
+      this.parentContainer.add(particle);
+      particle.visible = false; // Hidden by default
 
       // Randomize the z-coordinates for depth effect (without affecting the data)
       const zRange = 0.2;
@@ -160,7 +157,7 @@ export class Cloud {
       const bounds = this.renderer.domElement.getBoundingClientRect();
       const mouse = { x: ((e.clientX - bounds.left) / this.width) * 2 - 1, y: -((e.clientY - bounds.top) / this.height) * 2 + 1 };
       raycaster.setFromCamera(mouse, this.camera);
-      const intersections = raycaster.intersectObjects(this.scene.children, true);
+      const intersections = raycaster.intersectObjects(this.scene.children, true).filter(intersection => intersection.object.visible);
       if (intersections.length > 0) {
         const intersection = intersections[0];
         this.selectedObject = intersection.object;
@@ -218,10 +215,9 @@ export class Cloud {
     let shown = 0;
     const particles = this.parentContainer.children;
     for (let i = 0; i < particles.length; i++) {
-      const particleObject = particles[i];
-      const particle = particleObject.children[0];
+      const particle = particles[i];
       const visible = shown < maxPointsShown && (year === ALL || particle.userData.year === year);
-      particleObject.visible = visible;
+      particle.visible = visible;
       if (visible) {
         shown++;
       }

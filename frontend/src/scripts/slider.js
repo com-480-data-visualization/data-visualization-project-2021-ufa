@@ -16,11 +16,12 @@ export class Slider {
 
     this.svg = d3
       .create('svg')
-      .attr('viewBox', [0, 0, 750, 100].join(' '));
+      .attr('viewBox', [0, 0, 750, 50].join(' '))
+      .classed('overflow-visible', true);
 
     this.gTime = this.svg
       .append('g')
-      .attr('transform', 'translate(30,30)');
+      .attr('transform', 'translate(25,10)');
 
     this.gTime.call(this.sliderTime);
 
