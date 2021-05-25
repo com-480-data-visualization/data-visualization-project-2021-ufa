@@ -4,6 +4,8 @@ import os
 import networkx as nx
 import numpy as np
 import pandas as pd
+import requests
+from bs4 import BeautifulSoup
 
 from sklearn.decomposition import TruncatedSVD, PCA
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -30,6 +32,14 @@ def cached_or_compute(compute, filename, serialize, deserialize, no_cache=False)
     else:
         print("Loading cached '%s'..." % filename)
         return deserialize(path_cached)
+
+def serialize_json(filename, data):
+    with open(filename, "w") as f:
+        json.dump(data, f, separators=(",", ":"))
+
+
+def deserialize_json(filename):
+    return json.load(filename)
 
 
 def serialize_dataframe(filename, dataframe):
@@ -118,18 +128,29 @@ def compute_abstracts_pca(df):
     # Final transformation (dense to 2D)
     return PCA(n_components=2).fit_transform(abstracts_svd)
 
+
+def fetch_categories_names():
+    request = requests.get("https://arxiv.org/help/api/user-manual")
+    soup = BeautifulSoup(request.text, "html.parser")
+
+    h3 = soup.find("h3", id="53-subject-classifications")
+    table_rows = h3.findNext("table").find("tbody").findAll("tr")
+    categories = [[e.text for e in row.findChildren()] for row in table_rows]
+    return dict([(category_id, category_name) for category_id, category_name in categories])
+
+
 def merge_dicts(a, b, path=None):
     """Borrowed from: https://stackoverflow.com/questions/7204805/how-to-merge-dictionaries-of-dictionaries"""
-    "merges b into a"
-    if path is None: path = []
+    if path is None:
+        path = []
     for key in b:
         if key in a:
             if isinstance(a[key], dict) and isinstance(b[key], dict):
                 merge_dicts(a[key], b[key], path + [str(key)])
             elif a[key] == b[key]:
-                pass # same leaf value
+                pass  # Same leaf value
             else:
-                raise Exception('Conflict at %s' % '.'.join(path + [str(key)]))
+                raise Exception("Conflict at %s" % ".".join(path + [str(key)]))
         else:
             a[key] = b[key]
     return a
@@ -154,8 +175,7 @@ def main():
         return o
 
     def dump_json(filename, data):
-        with open(os.path.join(path_output_directory, filename), "w") as f:
-            json.dump(data, f, separators=(',', ':'))
+        serialize_json(os.path.join(path_output_directory, filename), data)
 
     np.random.seed(1)  # Reproducibility
 
@@ -194,20 +214,29 @@ def main():
     dump_json("papers.json", round_floats(selected_papers.to_dict("index"), 5))
     
     print("Calculating and writing paper counts...")
-    papers_expand = df.drop('categories', axis=1).join(df.categories.str.split(expand=True).stack().reset_index(drop=True, level=1).rename('categories'))
-    t_index = pd.DatetimeIndex(pd.date_range(start='2007', end='2021', freq="W"))
-    paper_counts = papers_expand.groupby('categories').apply(lambda x: x.resample('W', on='update_date').size().reindex(t_index).fillna(0).astype('int32'))
+    papers_expand = df.drop("categories", axis=1) \
+        .join(df.categories.str.split(expand=True).stack().reset_index(drop=True, level=1).rename("categories"))
+    t_index = pd.DatetimeIndex(pd.date_range(start="2007", end="2021", freq="W"))
+    paper_counts = papers_expand.groupby("categories") \
+        .apply(lambda x: x.resample("W", on="update_date").size().reindex(t_index).fillna(0).astype("int32"))
     paper_counts = pd.DataFrame(paper_counts.stack()).reset_index()
-    paper_counts.columns = ["categories","date","count"]
-    paper_counts_all_temp = paper_counts.groupby("categories").apply(lambda x: {"date": x['date'].dt.strftime('%Y-%m-%d').tolist(), "count": x["count"].tolist()}).to_dict()
+    paper_counts.columns = ["categories", "date", "count"]
+    paper_counts_all_temp = paper_counts.groupby("categories") \
+        .apply(lambda x: {"date": x["date"].dt.strftime("%Y-%m-%d").tolist(), "count": x["count"].tolist()}).to_dict()
     paper_counts_all = {}
     for key, value in paper_counts_all_temp.items():
-        paper_counts_all[key] = {"all":value}
-    paper_counts = paper_counts.groupby(["categories",paper_counts.date.dt.year]).apply(lambda x: {"date": x['date'].dt.strftime('%Y-%m-%d').tolist(), "count": x["count"].tolist()})
+        paper_counts_all[key] = {"all": value}
+    paper_counts = paper_counts.groupby(["categories", paper_counts.date.dt.year]) \
+        .apply(lambda x: {"date": x["date"].dt.strftime("%Y-%m-%d").tolist(), "count": x["count"].tolist()})
     paper_counts_years = {level: paper_counts.xs(level).to_dict() for level in paper_counts.index.levels[0]}
     paper_counts_all = merge_dicts(paper_counts_all, paper_counts_years)
 
     dump_json("paper_counts.json", paper_counts_all)
+
+    categories_names = cached_or_compute(lambda: fetch_categories_names(),
+                                         "categories_names.json", serialize_json, deserialize_json)
+
+    dump_json("categories_names.json", categories_names)
 
     print("All done.")
 

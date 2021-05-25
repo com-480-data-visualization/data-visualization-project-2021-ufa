@@ -7,13 +7,15 @@ import { CATEGORIES, categoriesColors, color, getCategoryIndexAndLabel } from '.
 
 export class Graph {
 
-  constructor() {
+  constructor(categoriesNames) {
     this.container = d3.select('#categories-graph');
 
     const containerDom = this.container.node();
     this.aspect = containerDom.clientWidth / containerDom.clientHeight;
     this.width = 1000;
     this.height = this.width / this.aspect;
+
+    this.categoriesNames = categoriesNames;
 
     this.simulation = null;
   }
@@ -84,7 +86,8 @@ export class Graph {
       gNodes.classed('opacity-10', node ? d => !connectedSet.has(d.id) : false);
       gLinks.classed('hidden', node ? d => d.source.id !== node.id && d.target.id !== node.id : false);
       d3.select('#categories-selected-category').text(node && node.id).style('color', node && color(node));
-      d3.select('#categories-selected-field').text(node && getCategoryIndexAndLabel(node.id).label);
+      d3.select('#categories-selected-field').text(node &&
+        (this.categoriesNames[node.id] || getCategoryIndexAndLabel(node.id).label));
       d3.select('#categories-selected-count').text(node && categoriesCounts[node.id].toLocaleString());
 
       tooltip.classed('hidden', !node);

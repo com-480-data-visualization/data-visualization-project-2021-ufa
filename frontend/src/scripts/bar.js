@@ -56,6 +56,8 @@ export class BarPlot {
   update(dataBar = []) {
     this.dataBar = dataBar;
 
+    this.svgBar.classed('opacity-20', !dataBar.length);
+
     this.svgBar.selectAll('mybar').remove();
     this.svgBar.selectAll('rect').remove();
     this.svgBar.selectAll('.axis-bottom-text').remove();

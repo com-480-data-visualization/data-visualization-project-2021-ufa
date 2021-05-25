@@ -1,6 +1,13 @@
 import * as d3 from 'd3';
 import { heightChart, margin, widthChart } from './common';
 
+const statsOf = values => {
+  const n = values.length;
+  const mean = values.reduce((a, b) => a + b, 0) / n;
+  const variance = values.map(v => (v - mean)).map(x => x * x).reduce((a, b) => a + b, 0) / (n - 1);
+  const deviation = Math.sqrt(variance);
+  return { mean, variance, deviation };
+};
 
 export class LinePlot {
 
@@ -9,12 +16,16 @@ export class LinePlot {
 
   update(dataLine = [], lineColor = '') {
 
+    const { mean, deviation } = statsOf(dataLine.map(o => o.value));
+
     d3.select('#published-line').select('svg').remove();
 
     this.svg = d3.select('#published-line')
       .append('svg')
       .attr('viewBox', [0, 0, widthChart + margin.left + margin.right, heightChart + margin.top + margin.bottom].join(' '))
       .attr('class', 'max-w-full max-h-full');
+
+    this.svg.classed('opacity-20', !dataLine.length);
 
     let line = d3.line()
       .defined(d => !isNaN(d.value))
@@ -32,7 +43,7 @@ export class LinePlot {
         .text(dataLine.y));
 
     let y = d3.scaleLinear()
-      .domain([0, d3.max(dataLine, d => d.value)]).nice()
+      .domain([0, Math.min(d3.max(dataLine, d => d.value), mean + 1.5 * deviation)]).nice()
       .range([heightChart, 0]);
 
     let x = d3.scaleTime()

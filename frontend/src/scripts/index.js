@@ -16,11 +16,12 @@ if (process.env.NODE_ENV === 'development') { // Do not remove: used for hot rel
 const fetchJson = filename => fetch(`public/data/${filename}`).then(response => response.json());
 
 Promise.all([
+  'categories_names.json',
   'categories_graph.json',
   'categories_counts.json',
   'papers.json',
   'paper_counts.json',
-].map(fetchJson)).then(([graph, categoriesCounts, papers, paperCounts]) => {
+].map(fetchJson)).then(([categoriesNames, graph, categoriesCounts, papers, paperCounts]) => {
   makeBodyVisible();
 
   let minYear = null, maxYear = null;
@@ -36,7 +37,7 @@ Promise.all([
     }
   });
 
-  const catGraph = new Graph();
+  const catGraph = new Graph(categoriesNames);
   const cloud = new Cloud(papers);
   const barPlot = new BarPlot();
   const linePlot = new LinePlot();
