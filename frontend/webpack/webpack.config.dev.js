@@ -11,7 +11,7 @@ module.exports = merge(common, {
   output: {
     chunkFilename: 'js/[name].chunk.js',
   },
-  target: "web", // Required for hot reload
+  target: 'web', // Required for hot reload
   devServer: {
     inline: true,
     hot: true,
@@ -47,7 +47,19 @@ module.exports = merge(common, {
       },
       {
         test: /\.s?css$/i,
-        use: ['style-loader', 'css-loader?sourceMap=true', 'postcss-loader', 'sass-loader'],
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader?sourceMap=true',
+            options: {
+              modules: {
+                compileType: 'icss',
+              },
+            },
+          },
+          'postcss-loader',
+          'sass-loader',
+        ],
       },
     ],
   },

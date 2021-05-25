@@ -1,8 +1,7 @@
 import * as d3 from 'd3';
+import variables from '../styles/_export.scss';
 import { SIMILARITY_BAR_N } from './bar';
-// eslint-disable-next-line sort-imports
 import { CATEGORIES, categoriesColors, color, getCategoryIndexAndLabel } from './common';
-
 
 
 export class Graph {
@@ -151,14 +150,14 @@ export class Graph {
       .attr('stroke-width', d => 0.00025 * d.weight + 0.05);
 
     const gNodes = this.svg.append('g')
-      .attr('stroke', '#fff')
-      .attr('stroke-width', 1.5)
+      .attr('stroke', variables['background-color'])
+      .attr('stroke-width', 2.5)
       .style('cursor', 'pointer')
       .selectAll('circle')
       .data(nodes)
       .join('circle')
       .attr('class', 'transition-opacity duration-250')
-      .attr('r', d => Math.log(categoriesCounts[d.id]) * 0.7)
+      .attr('r', d => Math.log(categoriesCounts[d.id]) * 0.9)
       .attr('fill', color)
       ;//.call(drag(this.simulation));
 

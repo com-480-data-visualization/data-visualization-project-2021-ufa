@@ -1,16 +1,17 @@
 import * as THREE from 'three';
 import * as d3 from 'd3';
 import * as seedrandom from 'seedrandom';
+import variables from '../styles/_export.scss';
 import { getPaperMetadata, urlForPaper } from './api';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
-import { ALL, CATEGORIES, color, getCategoryIndexAndLabel } from './common';
+import { ALL, CATEGORIES, categoriesColors, color, getCategoryIndexAndLabel } from './common';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 
 const RectangleVignetteFilter = {
   uniforms: {
     'tDiffuse': { value: null },
-    'color': { value: new THREE.Color(1.0, 0.9921, 0.9607) },
+    'color': { value: new THREE.Color(variables['background-color']) },
   },
   vertexShader: [
     'varying vec2 vUv;',
@@ -66,10 +67,9 @@ export class Cloud {
     this.composer.addPass(vignettePass);
     const squareSize = 0.004;
     this.geometry = new THREE.PlaneGeometry(squareSize, squareSize);
-    const colorScheme = d3.schemeCategory10; // TODO improve this
     this.materials = CATEGORIES.map(category => new THREE.MeshBasicMaterial({
       //transparent: true,
-      color: new THREE.Color(colorScheme[category.index]),
+      color: new THREE.Color(categoriesColors[category.index]),
       //opacity: 0.8,
       //side: THREE.DoubleSide,
     }));
@@ -77,7 +77,7 @@ export class Cloud {
     this.parentContainer = new THREE.Object3D();
     this.scene.add(this.parentContainer);
 
-    this.scene.background = new THREE.Color('#fffdf5');
+    this.scene.background = new THREE.Color(variables['background-color']);
 
     let bbMin = new THREE.Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE), bbMax = bbMin.clone().negate();
     Object.entries(papers).forEach(([id, { categories, x, y, date }]) => {
