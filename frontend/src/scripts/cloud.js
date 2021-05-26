@@ -38,6 +38,8 @@ const RectangleVignetteFilter = {
 export class Cloud {
 
   constructor(papers) {
+    this.year = ALL;
+
     this.domContainer = document.getElementById('papers-cloud');
     const containerAspect = this.domContainer.clientWidth / this.domContainer.clientHeight;
     this.aspect = containerAspect; // If we need to fix the aspect, change this value
@@ -67,12 +69,6 @@ export class Cloud {
     this.composer.addPass(vignettePass);
     const squareSize = 0.004;
     this.geometry = new THREE.PlaneGeometry(squareSize, squareSize);
-    this.materials = CATEGORIES.map(category => new THREE.MeshBasicMaterial({
-      //transparent: true,
-      color: new THREE.Color(categoriesColors[category.index]),
-      //opacity: 0.8,
-      //side: THREE.DoubleSide,
-    }));
 
     this.parentContainer = new THREE.Object3D();
     this.scene.add(this.parentContainer);
@@ -84,7 +80,12 @@ export class Cloud {
       const categoriesList = categories.split(' ');
       const firstCategory = categoriesList[0];
       const categoryIndex = getCategoryIndexAndLabel(firstCategory).index;
-      const particle = new THREE.Mesh(this.geometry, this.materials[categoryIndex]);
+      const particle = new THREE.Mesh(this.geometry, new THREE.MeshBasicMaterial({
+        transparent: false,
+        color: new THREE.Color(categoriesColors[categoryIndex]),
+        opacity: 0.1,
+        //side: THREE.DoubleSide,
+      }));
       const year = new Date(date).getFullYear();
 
       this.parentContainer.add(particle);
@@ -157,7 +158,10 @@ export class Cloud {
       const bounds = this.renderer.domElement.getBoundingClientRect();
       const mouse = { x: ((e.clientX - bounds.left) / this.width) * 2 - 1, y: -((e.clientY - bounds.top) / this.height) * 2 + 1 };
       raycaster.setFromCamera(mouse, this.camera);
-      const intersections = raycaster.intersectObjects(this.scene.children, true).filter(intersection => intersection.object.visible);
+      const intersections = raycaster
+        .intersectObjects(this.scene.children, true)
+        .filter(intersection => intersection.object.visible)
+        .filter(intersection => !intersection.object.material.transparent);
       if (intersections.length > 0) {
         const intersection = intersections[0];
         this.selectedObject = intersection.object;
@@ -208,19 +212,32 @@ export class Cloud {
     render();
   }
 
-  update(year = ALL) {
+  initialize(graph) {
+    this.graph = graph;
+  }
+
+  setYear(year) {
+    this.year = year;
+    this.update();
+  }
+
+  update() {
     this.tooltip.classed('hidden', true);
 
+    const selectedCategory = this.graph.selectedNode;
     const maxPointsShown = 2500;
     let shown = 0;
     const particles = this.parentContainer.children;
     for (let i = 0; i < particles.length; i++) {
       const particle = particles[i];
-      const visible = shown < maxPointsShown && (year === ALL || particle.userData.year === year);
+      const visible = shown < maxPointsShown
+        && (this.year === ALL || particle.userData.year === this.year);
+      const transparent = !!selectedCategory && !particle.userData.categories.includes(selectedCategory.id);
       particle.visible = visible;
       if (visible) {
         shown++;
       }
+      particle.material.transparent = transparent;
     }
   }
 }

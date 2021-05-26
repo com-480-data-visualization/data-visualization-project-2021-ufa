@@ -12,14 +12,21 @@ const statsOf = values => {
 export class LinePlot {
 
   constructor() {
+    this.dataLine = [];
+    this.lineColor = '';
   }
 
-  update(dataLine = [], lineColor = '') {
+  setData(dataLine, lineColor) {
+    this.dataLine = dataLine;
+    this.lineColor = lineColor;
+    this.update();
+  }
 
-    console.log(dataLine);
-    let mainLine = dataLine.length != 0 ? dataLine[0]['values'] : [];
+  update() {
 
-    //const { mean, deviation } = statsOf(mainLine.map(o => o.value));
+    let mainLine = this.dataLine.length != 0 ? this.dataLine[0]['values'] : [];
+
+    //const { mean, deviation } = statsOf(this.dataLine.map(o => o.value));
 
     d3.select('#published-line').select('svg').remove();
 
@@ -28,7 +35,7 @@ export class LinePlot {
       .attr('viewBox', [0, 0, widthChart + margin.left + margin.right, heightChart + margin.top + margin.bottom].join(' '))
       .attr('class', 'max-w-full max-h-full');
 
-    this.svg.classed('opacity-20', !dataLine.length);
+    this.svg.classed('opacity-20', !this.dataLine.length);
 
     let line = d3.line()
       .defined(d => !isNaN(d.value))
@@ -46,7 +53,7 @@ export class LinePlot {
         .text(mainLine.y));
 
     let y = d3.scaleLinear()
-      .domain([0, d3.max(dataLine, d => d3.max(d.values, l => l.value))]).nice()
+      .domain([0, d3.max(this.dataLine, d => d3.max(d.values, l => l.value))]).nice()
       .range([heightChart, 0]);
 
     let x = d3.scaleTime()
@@ -83,11 +90,11 @@ export class LinePlot {
       .selectAll('.line')
       .append('g')
       .attr('class', 'line')
-      .data(dataLine)
+      .data(this.dataLine)
       .enter()
       .append('path')
       .attr('fill', 'none')
-      .attr('stroke', d => d['time'] != 'mean' ? lineColor : 'gray')
+      .attr('stroke', d => d['time'] != 'mean' ? this.lineColor : 'gray')
       .attr('stroke-width', 1.5)
       .attr('d', d => line(d['values']));
     //.attr('stroke-dasharray', xAxis.node().getTotalLength())

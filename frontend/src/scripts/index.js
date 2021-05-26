@@ -37,25 +37,24 @@ Promise.all([
     }
   });
 
-  const catGraph = new Graph(categoriesNames);
+  // Instantiate visualizations
+  const slider = new Slider(minYear, maxYear);
+  const catGraph = new Graph(categoriesNames, graph, categoriesCounts, paperCounts);
   const cloud = new Cloud(papers);
   const barPlot = new BarPlot();
   const linePlot = new LinePlot();
 
-  catGraph.initialize(barPlot, linePlot);
+  // Set back references
+  catGraph.initialize(cloud, barPlot, linePlot);
+  cloud.initialize(catGraph);
+  slider.initialize(catGraph, cloud, barPlot, linePlot);
 
-  catGraph.update(graph['all'], categoriesCounts['all'], paperCounts, 'all');
+  // Initial update (required)
+  slider.update();
+  catGraph.update();
   cloud.update();
   barPlot.update();
   linePlot.update();
 
-  let slider = new Slider(minYear, maxYear);
-  slider.update();
-  slider.sliderTime.on('end', val => {
-    const year = val === slider.tickAllTime ? ALL : val;
-
-    catGraph.update(graph[year], categoriesCounts[year], paperCounts, year);
-    cloud.update(year);
-  });
 });
 

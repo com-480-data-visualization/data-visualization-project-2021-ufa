@@ -68,7 +68,7 @@
               <p class="text-sm">This is a weighted graph of all categories of papers in the arXiv database. The edges are proportional to the number of papers having the two categories at the same time. You can <span class="font-bold">click</span> and <span class="font-bold">drag</span> the nodes. When you click or hover a node you can see the adjacent categories and additional statistics below.</p>
             </div>
         </div>
-        <div id="graph-tooltip" class="absolute w-min pointer-events-none hidden" style="transform: translate(-50%, -80%)">
+        <div id="graph-tooltip" class="absolute w-min pointer-events-none opacity-90 hidden" style="transform: translate(-50%, -80%)">
           <div class="bg-black text-white text-sm rounded py-1 px-4 right-0 bottom-full text-center max-w-xl">
             <span id="categories-selected-category" class="block whitespace-nowrap overflow-hidden overflow-ellipsis text-glow"></span>
             <span id="categories-selected-field" class="block whitespace-nowrap overflow-hidden overflow-ellipsis font-bold"></span>
@@ -92,7 +92,7 @@
             <p class="text-sm">Each point represents a paper which you can either <span class="font-bold">click</span> on to reveal its name and categories or <span class="font-bold">search</span> in the bar below to discover its position. The cloud was built using PCA on the title/abstract.</p>
           </div>
         </div>
-        <div id="cloud-tooltip" class="absolute w-min left-1/2 top-1/2 hidden" style="transform: translate(-50%, -100%)">
+        <div id="cloud-tooltip" class="absolute w-min left-1/2 top-1/2 opacity-90 hidden" style="transform: translate(-50%, -100%)">
           <div class="bg-black text-white text-sm rounded py-1 px-4 right-0 bottom-full text-center max-w-xl">
             <a href="#" target="_blank" id="cloud-tooltip-link" class="block whitespace-nowrap underline"></a>
             <span id="cloud-tooltip-description" class="block whitespace-nowrap overflow-hidden overflow-ellipsis font-bold"></span>

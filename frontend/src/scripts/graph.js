@@ -1,12 +1,12 @@
 import * as d3 from 'd3';
 import variables from '../styles/_export.scss';
 import { SIMILARITY_BAR_N } from './bar';
-import { CATEGORIES, categoriesColors, color, getCategoryIndexAndLabel } from './common';
+import { ALL, CATEGORIES, categoriesColors, color, getCategoryIndexAndLabel } from './common';
 
 
 export class Graph {
 
-  constructor(categoriesNames) {
+  constructor(categoriesNames, graphData, categoriesCounts, paperCounts) {
     this.container = d3.select('#categories-graph');
 
     const containerDom = this.container.node();
@@ -14,17 +14,28 @@ export class Graph {
     this.width = 1000;
     this.height = this.width / this.aspect;
 
+    this.year = ALL;
+
     this.categoriesNames = categoriesNames;
+    this.graphData = graphData;
+    this.categoriesCounts = categoriesCounts;
+    this.paperCounts = paperCounts;
 
     this.simulation = null;
   }
 
-  initialize(barPlot, linePlot) {
+  initialize(cloud, barPlot, linePlot) {
+    this.cloud = cloud;
     this.linePlot = linePlot;
     this.barPlot = barPlot;
   }
 
-  update(graph, categoriesCounts, paperCounts, paperCountsDate) {
+  setYear(year) {
+    this.year = year;
+    this.update();
+  }
+
+  update() {
     if (this.simulation) { // Cancel previous simulation, if any
       this.simulation.stop();
     }
@@ -35,8 +46,8 @@ export class Graph {
       .attr('viewBox', [0, 0, this.width, this.height].join(' '))
       .attr('class', 'max-w-full max-h-full overflow-visible');
 
-    const links = graph.links;
-    const nodes = graph.nodes;
+    const links = this.graphData[this.year].links;
+    const nodes = this.graphData[this.year].nodes;
 
     const force = 0.1;
     const charge = 150;
@@ -47,7 +58,7 @@ export class Graph {
       .force('forceY', d3.forceY().strength(force * this.aspect))
       .force('center', d3.forceCenter(this.width / 2, this.height / 2));
 
-    let selectedNode = null;
+    this.selectedNode = null;
     let hoveredNode = null;
 
     const tooltip = d3.select('#graph-tooltip');
@@ -59,9 +70,29 @@ export class Graph {
       }
       return currDate;
     };
+    const updateTooltipPosition = () => {
+      const node = hoveredNode;
+      if (node) {
+        const containerDom = this.container.node();
+        tooltip
+          .style('top', (node.y / this.height * containerDom.clientHeight) + 'px')
+          .style('left', (node.x / this.width * containerDom.clientWidth) + 'px');
+      }
+    };
+
+    const updateTooltip = () => {
+      updateTooltipPosition();
+
+      d3.select('#categories-selected-category').text(hoveredNode && hoveredNode.id).style('color', hoveredNode && color(hoveredNode));
+      d3.select('#categories-selected-field').text(hoveredNode &&
+        (this.categoriesNames[hoveredNode.id] || getCategoryIndexAndLabel(hoveredNode.id).label));
+      d3.select('#categories-selected-count').text(hoveredNode && this.categoriesCounts[this.year][hoveredNode.id].toLocaleString());
+
+      tooltip.classed('hidden', !hoveredNode);
+    };
 
     const updateHighlights = () => {
-      const node = selectedNode || hoveredNode;
+      const node = this.selectedNode;
       const connectedSet = new Set();
       const connectedWeights = [];
       const dataLine = [];
@@ -79,15 +110,15 @@ export class Graph {
             connectedWeights.push({ id: neighbour, weight: l.weight });
           }
         });
-        let items = paperCounts[node.id][paperCountsDate]['count'];
-        let date = paperCounts[node.id][paperCountsDate]['date'];
+        let items = this.paperCounts[node.id][this.year]['count'];
+        let date = this.paperCounts[node.id][this.year]['date'];
         let currValues = [];
-        items.forEach((item, i) => (currValues.push({ date: sameYearDate(date[i], paperCountsDate), value: item })));
-        dataLine.push({ 'time': paperCountsDate, 'values': currValues });
+        items.forEach((item, i) => (currValues.push({ date: sameYearDate(date[i], this.year), value: item })));
+        dataLine.push({ 'time': this.year, 'values': currValues });
 
-        if (paperCountsDate != 'all') {
-          items = paperCounts[node.id]['mean']['count'];
-          date = paperCounts[node.id]['mean']['date'];
+        if (this.year != 'all') {
+          items = this.paperCounts[node.id]['mean']['count'];
+          date = this.paperCounts[node.id]['mean']['date'];
           currValues = [];
           items.forEach((item, i) => (currValues.push({ date: new Date(2000, date[i], 0), value: item })));
           dataLine.push({ 'time': 'mean', 'values': currValues });
@@ -100,50 +131,14 @@ export class Graph {
         .slice(0, SIMILARITY_BAR_N);
 
       gNodes.classed('opacity-10', node ? d => !connectedSet.has(d.id) : false);
+      gNodes.attr('stroke', d => this.selectedNode === d ? 'black' : variables['background-color']);
       gLinks.classed('hidden', node ? d => d.source.id !== node.id && d.target.id !== node.id : false);
-      d3.select('#categories-selected-category').text(node && node.id).style('color', node && color(node));
-      d3.select('#categories-selected-field').text(node &&
-        (this.categoriesNames[node.id] || getCategoryIndexAndLabel(node.id).label));
-      d3.select('#categories-selected-count').text(node && categoriesCounts[node.id].toLocaleString());
 
-      tooltip.classed('hidden', !node);
+      this.barPlot.setData(connectedWeightRatios);
+      this.linePlot.setData(dataLine, node ? color(node) : '');
 
-      this.barPlot.update(connectedWeightRatios);
-      this.linePlot.update(dataLine, node ? color(node) : '');
+      this.cloud.update();
     };
-
-    // eslint-disable-next-line no-unused-vars
-    const drag = simulation => {
-      function dragstarted(event) {
-        if (!event.active) simulation.alphaTarget(0.3).restart();
-        event.subject.fx = event.subject.x;
-        event.subject.fy = event.subject.y;
-
-        selectedNode = event.subject;
-        updateHighlights();
-      }
-
-      function dragged(event) {
-        event.subject.fx = event.x;
-        event.subject.fy = event.y;
-      }
-
-      function dragended(event) {
-        if (!event.active) simulation.alphaTarget(0);
-        event.subject.fx = null;
-        event.subject.fy = null;
-
-        selectedNode = null;
-        updateHighlights();
-      }
-
-      return d3.drag()
-        .on('start', dragstarted)
-        .on('drag', dragged)
-        .on('end', dragended);
-    };
-
-
 
     const gClusters = this.svg.append('g')
       .attr('font-weight', 'bold')
@@ -174,19 +169,8 @@ export class Graph {
       .data(nodes)
       .join('circle')
       .attr('class', 'transition-opacity duration-250')
-      .attr('r', d => Math.log(categoriesCounts[d.id]) * 0.9)
-      .attr('fill', color)
-      ;//.call(drag(this.simulation));
-
-    const updateTooltipPosition = () => {
-      const node = hoveredNode;
-      if (node) {
-        const containerDom = this.container.node();
-        tooltip
-          .style('top', (node.y / this.height * containerDom.clientHeight) + 'px')
-          .style('left', (node.x / this.width * containerDom.clientWidth) + 'px');
-      }
-    };
+      .attr('r', d => Math.log(this.categoriesCounts[this.year][d.id]) * 0.9)
+      .attr('fill', color);
 
     this.simulation.on('tick', () => {
       const clampX = x => Math.max(0, Math.min(this.width, x));
@@ -228,22 +212,26 @@ export class Graph {
     gNodes
       .on('mouseover', (_, d) => {
         hoveredNode = d;
-        updateTooltipPosition();
-        if (!selectedNode) { // Avoid expensive updates
-          updateHighlights();
-        }
+        updateTooltip();
       })
       .on('mouseout', () => {
         hoveredNode = null;
-        if (!selectedNode) {
-          updateHighlights();
+        updateTooltip();
+      })
+      .on('click', (event, d) => {
+        if (d !== this.selectedNode) {
+          this.selectedNode = d;
+        } else {
+          this.selectedNode = null;
         }
+        updateHighlights();
+        event.stopPropagation(); // The event won't trigger on parent elements
       });
-    // Disabled for now, future use case
-    /*.on('click', (_, d) => {
-      selectedNode = d;
+
+    this.svg.on('click', () => {
+      this.selectedNode = null;
       updateHighlights();
-    });*/
+    });
 
     this.container.node().append(this.svg.node());
 
