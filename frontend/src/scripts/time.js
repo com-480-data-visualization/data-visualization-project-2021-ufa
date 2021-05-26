@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 import { heightChart, margin, widthChart } from './common';
-
+/*
 const statsOf = values => {
   const n = values.length;
   const mean = values.reduce((a, b) => a + b, 0) / n;
@@ -8,7 +8,7 @@ const statsOf = values => {
   const deviation = Math.sqrt(variance);
   return { mean, variance, deviation };
 };
-
+*/
 export class LinePlot {
 
   constructor() {
@@ -16,7 +16,10 @@ export class LinePlot {
 
   update(dataLine = [], lineColor = '') {
 
-    const { mean, deviation } = statsOf(dataLine.map(o => o.value));
+    console.log(dataLine);
+    let mainLine = dataLine.length != 0 ? dataLine[0]['values'] : [];
+
+    //const { mean, deviation } = statsOf(mainLine.map(o => o.value));
 
     d3.select('#published-line').select('svg').remove();
 
@@ -40,14 +43,14 @@ export class LinePlot {
         .attr('x', 3)
         .attr('text-anchor', 'start')
         .attr('font-weight', 'bold')
-        .text(dataLine.y));
+        .text(mainLine.y));
 
     let y = d3.scaleLinear()
-      .domain([0, Math.min(d3.max(dataLine, d => d.value), mean + 1.5 * deviation)]).nice()
+      .domain([0, d3.max(dataLine, d => d3.max(d.values, l => l.value))]).nice()
       .range([heightChart, 0]);
 
     let x = d3.scaleTime()
-      .domain(d3.extent(dataLine, d => d.date))
+      .domain(d3.extent(mainLine, d => d.date))
       .range([margin.left, widthChart + margin.left]);
 
     let xAxis = g => g
@@ -76,21 +79,22 @@ export class LinePlot {
       .style('text-anchor', 'middle')
       .text('#papers');
 
-    let path = this.svg.append('path')
-      .datum(dataLine)
+    this.svg
+      .selectAll('.line')
+      .append('g')
+      .attr('class', 'line')
+      .data(dataLine)
+      .enter()
+      .append('path')
       .attr('fill', 'none')
-      .attr('stroke', lineColor)
+      .attr('stroke', d => d['time'] != 'mean' ? lineColor : 'gray')
       .attr('stroke-width', 1.5)
-      .attr('d', line);
-
-
-    let totalLength = path.node().getTotalLength();
-
-    path.attr('stroke-dasharray', totalLength)
-      .attr('stroke-dashoffset', totalLength)
-      .transition()
-      .duration(500)
-      .attr('stroke-dashoffset', 0);
+      .attr('d', d => line(d['values']));
+    //.attr('stroke-dasharray', xAxis.node().getTotalLength())
+    //.attr('stroke-dashoffset', xAxis.node().getTotalLength())
+    //.transition()
+    //.duration(500)
+    //.attr('stroke-dashoffset', 0);
 
     d3.select('#published-line').node().append(this.svg.node());
 

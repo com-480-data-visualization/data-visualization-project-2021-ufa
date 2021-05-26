@@ -52,6 +52,14 @@ export class Graph {
 
     const tooltip = d3.select('#graph-tooltip');
 
+    let sameYearDate = (date, selectedDate) => {
+      let currDate = new Date(date);
+      if (selectedDate != 'all') {
+        return new Date(2000, currDate.getMonth() + 1, 0);
+      }
+      return currDate;
+    };
+
     const updateHighlights = () => {
       const node = selectedNode || hoveredNode;
       const connectedSet = new Set();
@@ -71,10 +79,19 @@ export class Graph {
             connectedWeights.push({ id: neighbour, weight: l.weight });
           }
         });
+        let items = paperCounts[node.id][paperCountsDate]['count'];
+        let date = paperCounts[node.id][paperCountsDate]['date'];
+        let currValues = [];
+        items.forEach((item, i) => (currValues.push({ date: sameYearDate(date[i], paperCountsDate), value: item })));
+        dataLine.push({ 'time': paperCountsDate, 'values': currValues });
 
-        const items = paperCounts[node.id][paperCountsDate]['count'];
-        const date = paperCounts[node.id][paperCountsDate]['date'];
-        items.forEach((item, i) => (dataLine.push({ date: new Date(date[i]), value: item })));
+        if (paperCountsDate != 'all') {
+          items = paperCounts[node.id]['mean']['count'];
+          date = paperCounts[node.id]['mean']['date'];
+          currValues = [];
+          items.forEach((item, i) => (currValues.push({ date: new Date(2000, date[i], 0), value: item })));
+          dataLine.push({ 'time': 'mean', 'values': currValues });
+        }
       }
       const weightSum = connectedWeights.map(({ weight }) => weight).reduce((a, b) => a + b, 0);
       const connectedWeightRatios = connectedWeights

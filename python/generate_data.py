@@ -216,11 +216,16 @@ def main():
     print("Calculating and writing paper counts...")
     papers_expand = df.drop("categories", axis=1) \
         .join(df.categories.str.split(expand=True).stack().reset_index(drop=True, level=1).rename("categories"))
-    t_index = pd.DatetimeIndex(pd.date_range(start="2007", end="2021", freq="W"))
+    t_index = pd.DatetimeIndex(pd.date_range(start="2007", end="2021", freq="M"))
     paper_counts = papers_expand.groupby("categories") \
-        .apply(lambda x: x.resample("W", on="update_date").size().reindex(t_index).fillna(0).astype("int32"))
+        .apply(lambda x: x.resample("M", on="update_date").size().reindex(t_index).fillna(0).astype("int32"))
     paper_counts = pd.DataFrame(paper_counts.stack()).reset_index()
     paper_counts.columns = ["categories", "date", "count"]
+    mean_counts = paper_counts.groupby(["categories",paper_counts.date.dt.month]).mean().reset_index()
+    paper_counts_mean_temp = mean_counts.groupby("categories").apply(lambda x: {"date": x['date'].tolist(), "count": x["count"].tolist()}).to_dict()
+    paper_counts_mean = {}
+    for key, value in paper_counts_mean_temp.items():
+        paper_counts_mean[key] = {"mean":value}
     paper_counts_all_temp = paper_counts.groupby("categories") \
         .apply(lambda x: {"date": x["date"].dt.strftime("%Y-%m-%d").tolist(), "count": x["count"].tolist()}).to_dict()
     paper_counts_all = {}
@@ -229,7 +234,7 @@ def main():
     paper_counts = paper_counts.groupby(["categories", paper_counts.date.dt.year]) \
         .apply(lambda x: {"date": x["date"].dt.strftime("%Y-%m-%d").tolist(), "count": x["count"].tolist()})
     paper_counts_years = {level: paper_counts.xs(level).to_dict() for level in paper_counts.index.levels[0]}
-    paper_counts_all = merge_dicts(paper_counts_all, paper_counts_years)
+    paper_counts_all = merge_dicts(paper_counts_mean, merge_dicts(paper_counts_all, paper_counts_years))
 
     dump_json("paper_counts.json", paper_counts_all)
 
