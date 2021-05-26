@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import { sliderBottom } from 'd3-simple-slider';
+import { ALL } from './common';
 
 export class Slider {
   constructor(minValue, maxValue) {
@@ -26,6 +27,17 @@ export class Slider {
     this.gTime.call(this.sliderTime);
 
     d3.select('#slider-time').node().append(this.svg.node());
+  }
+
+  initialize(catGraph, cloud, barPlot, linePlot) {
+    this.sliderTime.on('end', val => {
+      const year = val === this.tickAllTime ? ALL : val;
+
+      catGraph.setYear(year);
+      cloud.setYear(year);
+      barPlot.setData([]);
+      linePlot.setData([], '');
+    });
   }
 
   update() {

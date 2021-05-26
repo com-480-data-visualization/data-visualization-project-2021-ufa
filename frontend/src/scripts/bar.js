@@ -53,10 +53,13 @@ export class BarPlot {
       .text('weight ratios');
   }
 
-  update(dataBar = []) {
+  setData(dataBar) {
     this.dataBar = dataBar;
+    this.update();
+  }
 
-    this.svgBar.classed('opacity-20', !dataBar.length);
+  update() {
+    this.svgBar.classed('opacity-20', !this.dataBar.length);
 
     this.svgBar.selectAll('mybar').remove();
     this.svgBar.selectAll('rect').remove();

@@ -12,11 +12,19 @@ const statsOf = values => {
 export class LinePlot {
 
   constructor() {
+    this.dataLine = [];
+    this.lineColor = '';
   }
 
-  update(dataLine = [], lineColor = '') {
+  setData(dataLine, lineColor) {
+    this.dataLine = dataLine;
+    this.lineColor = lineColor;
+    this.update();
+  }
 
-    const { mean, deviation } = statsOf(dataLine.map(o => o.value));
+  update() {
+
+    const { mean, deviation } = statsOf(this.dataLine.map(o => o.value));
 
     d3.select('#published-line').select('svg').remove();
 
@@ -25,7 +33,7 @@ export class LinePlot {
       .attr('viewBox', [0, 0, widthChart + margin.left + margin.right, heightChart + margin.top + margin.bottom].join(' '))
       .attr('class', 'max-w-full max-h-full');
 
-    this.svg.classed('opacity-20', !dataLine.length);
+    this.svg.classed('opacity-20', !this.dataLine.length);
 
     let line = d3.line()
       .defined(d => !isNaN(d.value))
@@ -40,14 +48,14 @@ export class LinePlot {
         .attr('x', 3)
         .attr('text-anchor', 'start')
         .attr('font-weight', 'bold')
-        .text(dataLine.y));
+        .text(this.dataLine.y));
 
     let y = d3.scaleLinear()
-      .domain([0, Math.min(d3.max(dataLine, d => d.value), mean + 1.5 * deviation)]).nice()
+      .domain([0, Math.min(d3.max(this.dataLine, d => d.value), mean + 1.5 * deviation)]).nice()
       .range([heightChart, 0]);
 
     let x = d3.scaleTime()
-      .domain(d3.extent(dataLine, d => d.date))
+      .domain(d3.extent(this.dataLine, d => d.date))
       .range([margin.left, widthChart + margin.left]);
 
     let xAxis = g => g
@@ -77,9 +85,9 @@ export class LinePlot {
       .text('#papers');
 
     let path = this.svg.append('path')
-      .datum(dataLine)
+      .datum(this.dataLine)
       .attr('fill', 'none')
-      .attr('stroke', lineColor)
+      .attr('stroke', this.lineColor)
       .attr('stroke-width', 1.5)
       .attr('d', line);
 
