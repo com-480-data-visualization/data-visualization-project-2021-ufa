@@ -24,10 +24,11 @@ export class Graph {
     this.simulation = null;
   }
 
-  initialize(cloud, barPlot, linePlot) {
+  initialize(cloud, barPlot, linePlot, keywords) {
     this.cloud = cloud;
     this.linePlot = linePlot;
     this.barPlot = barPlot;
+    this.keywords = keywords;
   }
 
   setYear(year) {
@@ -65,7 +66,7 @@ export class Graph {
 
     let sameYearDate = (date, selectedDate) => {
       let currDate = new Date(date);
-      if (selectedDate != 'all') {
+      if (selectedDate !== ALL) {
         return new Date(2000, currDate.getMonth() + 1, 0);
       }
       return currDate;
@@ -116,7 +117,7 @@ export class Graph {
         items.forEach((item, i) => (currValues.push({ date: sameYearDate(date[i], this.year), value: item })));
         dataLine.push({ 'time': this.year, 'values': currValues });
 
-        if (this.year != 'all') {
+        if (this.year !== ALL) {
           items = this.paperCounts[node.id]['mean']['count'];
           date = this.paperCounts[node.id]['mean']['date'];
           currValues = [];
@@ -138,6 +139,7 @@ export class Graph {
       this.linePlot.setData(dataLine, node ? color(node) : '');
 
       this.cloud.update();
+      this.keywords.setCategory(this.selectedNode ? this.selectedNode.id : ALL);
     };
 
     const gClusters = this.svg.append('g')

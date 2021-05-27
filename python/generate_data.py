@@ -8,8 +8,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from sklearn.decomposition import TruncatedSVD, PCA
-from sklearn.feature_extraction.text import TfidfVectorizer
-
+from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 
 # Download dataset from Kaggle (registration required): https://www.kaggle.com/Cornell-University/arxiv/download
 input_file_arxiv = "../arxiv-metadata-oai-snapshot.json"
@@ -129,6 +128,64 @@ def compute_abstracts_pca(df):
     return PCA(n_components=2).fit_transform(abstracts_svd)
 
 
+def compute_keywords(df):
+    n_keywords = 100
+    categories = \
+        list(sorted(list(set([category for sub_categories in df.categories.str.split(" ").tolist()
+                              for category in sub_categories]))))
+    categories.insert(0, None)  # All categories
+    years = [year for year in range(df.update_date.min().year, df.update_date.max().year + 1)]
+    years.insert(0, None)  # All times
+    clean_titles = df.title.str.replace(r"(\$.+?\$)", "", regex=True)
+    df_cleaned = df.assign(clean_title=clean_titles)
+
+    obj = {}
+    unique_keywords = set()
+    for year in years:
+        obj_year = {}
+        if year is None:
+            year_key = "all"
+            df_by_year = df_cleaned
+        else:
+            year_key = year
+            df_by_year = df_cleaned[df_cleaned.update_date.dt.year == year]
+
+        for category in categories:
+            if category is None:
+                category_key = "all"
+                df_by_category = df_by_year
+            else:
+                category_key = category
+                df_by_category = df_by_year[df_by_year.categories.apply(lambda cs: category in cs.split(" "))]
+
+            corpus = df_by_category.clean_title.str.cat(sep="\n")  # Concatenate everything together
+
+            vectorizer = CountVectorizer(stop_words="english", max_features=n_keywords)
+
+            try:
+                x = vectorizer.fit_transform([corpus])
+                keywords = vectorizer.get_feature_names()
+                sorted_keywords = list(sorted(zip(keywords, map(lambda v: int(v), x.toarray()[0])),
+                                              key=lambda t: t[1], reverse=True))
+            except ValueError:  # Empty vocabulary
+                sorted_keywords = []
+
+            min_count = 50
+            sorted_keywords = list(filter(lambda t: t[1] > min_count, sorted_keywords))
+
+            for keyword, _ in sorted_keywords:
+                unique_keywords.add(keyword)
+
+            if len(sorted_keywords) > 0:  # Discard empty categories
+                obj_year[category_key] = {
+                    "keywords": sorted_keywords,
+                    "total": len(df_by_category)
+                }
+        obj[year_key] = obj_year
+
+    return obj
+
+
 def fetch_categories_names():
     request = requests.get("https://arxiv.org/help/api/user-manual")
     soup = BeautifulSoup(request.text, "html.parser")
@@ -242,6 +299,10 @@ def main():
                                          "categories_names.json", serialize_json, deserialize_json)
 
     dump_json("categories_names.json", categories_names)
+
+    print("Calculating keywords...")
+    keywords_data = compute_keywords(df)
+    dump_json("papers_keywords.json", keywords_data)
 
     print("All done.")
 

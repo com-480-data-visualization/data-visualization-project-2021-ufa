@@ -3,7 +3,20 @@ import { sliderBottom } from 'd3-simple-slider';
 import { ALL } from './common';
 
 export class Slider {
-  constructor(minValue, maxValue) {
+  constructor(categoriesCounts) {
+    let minValue = null, maxValue = null;
+    Object.keys(categoriesCounts).forEach(year => { // Represented as strings + contains "all"
+      if (year !== ALL) {
+        const yearInt = parseInt(year);
+        if (minValue === null || yearInt < minValue) {
+          minValue = yearInt;
+        }
+        if (maxValue === null || yearInt > maxValue) {
+          maxValue = yearInt;
+        }
+      }
+    });
+
     this.tickAllTime = maxValue + 1;
 
     this.sliderTime = sliderBottom()
@@ -29,7 +42,7 @@ export class Slider {
     d3.select('#slider-time').node().append(this.svg.node());
   }
 
-  initialize(catGraph, cloud, barPlot, linePlot) {
+  initialize(catGraph, cloud, barPlot, linePlot, keywords) {
     this.sliderTime.on('end', val => {
       const year = val === this.tickAllTime ? ALL : val;
 
@@ -37,6 +50,7 @@ export class Slider {
       cloud.setYear(year);
       barPlot.setData([]);
       linePlot.setData([], '');
+      keywords.setYear(year);
     });
   }
 

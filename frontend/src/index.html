@@ -105,7 +105,10 @@
       </div>
       <div id="similar-bar" class="col-span-1 row-span-4 w-full h-full overflow-hidden"></div>
       <div id="published-line" class="col-span-1 row-span-4 w-full h-full overflow-hidden"></div>
-      <div id="keywords" class="col-span-2 row-span-4 w-full h-full overflow-hidden"></div>
+      <div class="col-span-2 row-span-4 relative w-full h-full overflow-hidden">
+        <span id="keywords-placeholder" class="absolute left-1/2 top-1/2 text-xl italic text-gray-700 hidden" style="transform: translate(-50%, -50%)">Not enough data</span>
+        <div id="keywords" class="w-full h-full"></div>
+      </div>
     </div>
   </div>
 </body>

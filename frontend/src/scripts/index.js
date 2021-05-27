@@ -4,9 +4,10 @@ import '@fontsource/poppins';
 import { BarPlot } from './bar';
 import { Cloud } from './cloud';
 import { Graph } from './graph';
+import { Keywords } from './keywords';
 import { LinePlot } from './time';
 import { Slider } from './slider';
-import { makeBodyVisible } from './visibleBody';
+import { makeBodyVisible } from './page';
 
 if (process.env.NODE_ENV === 'development') { // Do not remove: used for hot reload
   require('../index.html');
@@ -20,33 +21,22 @@ Promise.all([
   'categories_counts.json',
   'papers.json',
   'paper_counts.json',
-].map(fetchJson)).then(([categoriesNames, graph, categoriesCounts, papers, paperCounts]) => {
+  'papers_keywords.json',
+].map(fetchJson)).then(([categoriesNames, graph, categoriesCounts, papers, paperCounts, papersKeywords]) => {
   makeBodyVisible();
 
-  let minYear = null, maxYear = null;
-  Object.keys(categoriesCounts).forEach(year => { // Represented as strings + contains "all"
-    if (year !== 'all') {
-      const yearInt = parseInt(year);
-      if (minYear === null || yearInt < minYear) {
-        minYear = yearInt;
-      }
-      if (maxYear === null || yearInt > maxYear) {
-        maxYear = yearInt;
-      }
-    }
-  });
-
   // Instantiate visualizations
-  const slider = new Slider(minYear, maxYear);
+  const slider = new Slider(categoriesCounts);
   const catGraph = new Graph(categoriesNames, graph, categoriesCounts, paperCounts);
   const cloud = new Cloud(papers);
   const barPlot = new BarPlot();
   const linePlot = new LinePlot();
+  const keywords = new Keywords(papersKeywords);
 
   // Set back references
-  catGraph.initialize(cloud, barPlot, linePlot);
+  slider.initialize(catGraph, cloud, barPlot, linePlot, keywords);
+  catGraph.initialize(cloud, barPlot, linePlot, keywords);
   cloud.initialize(catGraph);
-  slider.initialize(catGraph, cloud, barPlot, linePlot);
 
   // Initial update (required)
   slider.update();
@@ -54,6 +44,7 @@ Promise.all([
   cloud.update();
   barPlot.update();
   linePlot.update();
+  keywords.update();
 
 });
 
