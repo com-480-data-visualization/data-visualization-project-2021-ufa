@@ -5,7 +5,7 @@ import variables from '../styles/_export.scss';
 import { getPaperMetadata, urlForPaper } from './api';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
-import { ALL, CATEGORIES, categoriesColors, color, getCategoryIndexAndLabel } from './common';
+import { ALL, categoriesColors, color, getCategoryIndexAndLabel } from './common';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 
 const RectangleVignetteFilter = {

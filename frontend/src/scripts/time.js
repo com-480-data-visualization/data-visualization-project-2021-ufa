@@ -24,7 +24,7 @@ export class LinePlot {
 
   update() {
 
-    let mainLine = this.dataLine.length != 0 ? this.dataLine[0]['values'] : [];
+    let mainLine = this.dataLine.length !== 0 ? this.dataLine[0]['values'] : [];
 
     //const { mean, deviation } = statsOf(this.dataLine.map(o => o.value));
 
@@ -94,7 +94,7 @@ export class LinePlot {
       .enter()
       .append('path')
       .attr('fill', 'none')
-      .attr('stroke', d => d['time'] != 'mean' ? this.lineColor : 'gray')
+      .attr('stroke', d => d['time'] !== 'mean' ? this.lineColor : 'gray')
       .attr('stroke-width', 1.5)
       .attr('d', d => line(d['values']));
     //.attr('stroke-dasharray', xAxis.node().getTotalLength())

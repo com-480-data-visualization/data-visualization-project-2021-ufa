@@ -3,7 +3,6 @@ import 'tailwindcss/tailwind.css';
 import '@fontsource/poppins';
 import { BarPlot } from './bar';
 import { Cloud } from './cloud';
-import { ALL } from './common';
 import { Graph } from './graph';
 import { LinePlot } from './time';
 import { Slider } from './slider';
