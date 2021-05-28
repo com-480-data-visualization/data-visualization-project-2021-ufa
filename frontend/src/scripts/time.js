@@ -87,34 +87,35 @@ export class LinePlot {
       .style('text-anchor', 'middle')
       .text('#papers');
 
-    const path = this.svg
-      .selectAll('.line')
-      .append('g')
-      .attr('class', 'line')
-      .data(this.dataLine)
-      .enter()
+    if (this.dataLine.length != 0){
+      const mainPath = this.svg
+      .datum(this.dataLine[0])
       .append('path')
       .attr('fill', 'none')
-      .attr('stroke', d => d['time'] !== 'mean' ? this.lineColor : 'gray')
+      .attr('stroke', this.lineColor)
       .attr('stroke-width', 1.5)
       .attr('d', d => line(d['values']));
 
-    const pathNode = path.node();
+      if (this.dataLine.length == 2){
+        this.svg
+        .datum(this.dataLine[1])
+        .append('path')
+        .attr('fill', 'none')
+        .attr('stroke', 'gray')
+        .attr('stroke-width', 1.5)
+        .attr('d', d => line(d['values']));
+      }
 
-    if (pathNode !== null) { // Are there any values
-      const totalLength = pathNode.getTotalLength();
+      const totalLength = mainPath.node().getTotalLength();
 
-      path
+      mainPath
         .attr('stroke-dasharray', totalLength)
         .attr('stroke-dashoffset', totalLength)
         .transition()
         .duration(500)
         .attr('stroke-dashoffset', 0);
     }
-
     d3.select('#published-line').node().append(this.svg.node());
-
-
   }
 }
 
