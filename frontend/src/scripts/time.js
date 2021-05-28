@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import { heightChart, margin, widthChart } from './common';
+
 /*
 const statsOf = values => {
   const n = values.length;
@@ -86,7 +87,7 @@ export class LinePlot {
       .style('text-anchor', 'middle')
       .text('#papers');
 
-    this.svg
+    const path = this.svg
       .selectAll('.line')
       .append('g')
       .attr('class', 'line')
@@ -97,11 +98,19 @@ export class LinePlot {
       .attr('stroke', d => d['time'] !== 'mean' ? this.lineColor : 'gray')
       .attr('stroke-width', 1.5)
       .attr('d', d => line(d['values']));
-    //.attr('stroke-dasharray', xAxis.node().getTotalLength())
-    //.attr('stroke-dashoffset', xAxis.node().getTotalLength())
-    //.transition()
-    //.duration(500)
-    //.attr('stroke-dashoffset', 0);
+
+    const pathNode = path.node();
+
+    if (pathNode !== null) { // Are there any values
+      const totalLength = pathNode.getTotalLength();
+
+      path
+        .attr('stroke-dasharray', totalLength)
+        .attr('stroke-dashoffset', totalLength)
+        .transition()
+        .duration(500)
+        .attr('stroke-dashoffset', 0);
+    }
 
     d3.select('#published-line').node().append(this.svg.node());
 

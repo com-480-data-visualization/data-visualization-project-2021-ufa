@@ -32,13 +32,15 @@ def cached_or_compute(compute, filename, serialize, deserialize, no_cache=False)
         print("Loading cached '%s'..." % filename)
         return deserialize(path_cached)
 
+
 def serialize_json(filename, data):
     with open(filename, "w") as f:
         json.dump(data, f, separators=(",", ":"))
 
 
 def deserialize_json(filename):
-    return json.load(filename)
+    with open(filename) as f:
+        return json.load(f)
 
 
 def serialize_dataframe(filename, dataframe):
@@ -128,8 +130,8 @@ def compute_abstracts_pca(df):
     return PCA(n_components=2).fit_transform(abstracts_svd)
 
 
-def compute_keywords(df):
-    n_keywords = 100
+def compute_keywords(df, papers):
+    n_keywords = 50
     categories = \
         list(sorted(list(set([category for sub_categories in df.categories.str.split(" ").tolist()
                               for category in sub_categories]))))
@@ -139,7 +141,7 @@ def compute_keywords(df):
     clean_titles = df.title.str.replace(r"(\$.+?\$)", "", regex=True)
     df_cleaned = df.assign(clean_title=clean_titles)
 
-    obj = {}
+    obj_keywords = {}
     unique_keywords = set()
     for year in years:
         obj_year = {}
@@ -181,7 +183,17 @@ def compute_keywords(df):
                     "keywords": sorted_keywords,
                     "total": len(df_by_category)
                 }
-        obj[year_key] = obj_year
+        obj_keywords[year_key] = obj_year
+
+    obj_papers = {}
+    for keyword in unique_keywords:
+        matches = papers[(papers.title.str.lower().str.contains(keyword))] # | (papers.abstract.str.lower().str.contains(keyword))
+        obj_papers[keyword] = matches.index.tolist()
+
+    obj = {
+        "keywords": obj_keywords,
+        "papers": obj_papers
+    }
 
     return obj
 
@@ -301,7 +313,7 @@ def main():
     dump_json("categories_names.json", categories_names)
 
     print("Calculating keywords...")
-    keywords_data = compute_keywords(df)
+    keywords_data = compute_keywords(df, df_locs)
     dump_json("papers_keywords.json", keywords_data)
 
     print("All done.")

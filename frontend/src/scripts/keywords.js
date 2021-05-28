@@ -16,10 +16,11 @@ export class Keywords {
 
     this.year = ALL;
     this.category = ALL;
+    this.selected = null;
   }
 
-  initialize() {
-
+  initialize(cloud) {
+    this.cloud = cloud;
   }
 
   setYear(year) {
@@ -39,7 +40,8 @@ export class Keywords {
   update() {
     this.container.selectAll('*').remove();
 
-    const yearData = this.papersKeywords[this.year];
+    const keywordsData = this.papersKeywords.keywords;
+    const yearData = keywordsData[this.year];
     const data = yearData && yearData[this.category];
     let shown;
     if (data && data.keywords.length) {
@@ -64,9 +66,16 @@ export class Keywords {
       };
 
       const draw = words => {
-        this.container.append('svg')
+        const svg = this.container.append('svg')
           .attr('viewBox', [0, 0, this.width, this.height].join(' '))
           .attr('class', 'max-w-full max-h-full overflow-visible')
+          .on('click', () => {
+            this.selected = null;
+            this.update();
+            this.cloud.update();
+          });
+
+        svg
           .append('g')
           .attr('transform', 'translate(' + layout.size()[0] / 2 + ',' + layout.size()[1] / 2 + ')')
           .attr('text-anchor', 'middle')
@@ -82,7 +91,14 @@ export class Keywords {
             // Due to the `ALL` selector, this can happen. In this case fall back to the default color
             return color({ id: match !== null ? match : '' });
           })
-          .text(d => d.text);
+          .text(d => d.text)
+          .classed('opacity-20', d => this.selected !== null && d.text !== this.selected)
+          .on('click', (e, d) => {
+            e.stopPropagation();
+            this.selected = d.text;
+            this.update();
+            this.cloud.update();
+          });
       };
 
       const minSize = 10, maxSize = 50;

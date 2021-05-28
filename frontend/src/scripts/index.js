@@ -36,7 +36,8 @@ Promise.all([
   // Set back references
   slider.initialize(catGraph, cloud, barPlot, linePlot, keywords);
   catGraph.initialize(cloud, barPlot, linePlot, keywords);
-  cloud.initialize(catGraph);
+  cloud.initialize(catGraph, keywords);
+  keywords.initialize(cloud);
 
   // Initial update (required)
   slider.update();

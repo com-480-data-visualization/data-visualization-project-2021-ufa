@@ -46,11 +46,15 @@ export class Slider {
     this.sliderTime.on('end', val => {
       const year = val === this.tickAllTime ? ALL : val;
 
+      keywords.selected = null;
+
       catGraph.setYear(year);
       cloud.setYear(year);
       barPlot.setData([]);
       linePlot.setData([], '');
-      keywords.setYear(year);
+      keywords.year = year;
+      keywords.category = ALL; // Dirty
+      keywords.update();
     });
   }
 

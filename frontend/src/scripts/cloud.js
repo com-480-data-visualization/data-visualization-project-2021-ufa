@@ -37,8 +37,10 @@ const RectangleVignetteFilter = {
 
 export class Cloud {
 
-  constructor(papers) {
+  constructor(papers, papersKeywords) {
     this.year = ALL;
+
+    this.papersKeywords = papersKeywords;
 
     this.domContainer = document.getElementById('papers-cloud');
     const containerAspect = this.domContainer.clientWidth / this.domContainer.clientHeight;
@@ -212,8 +214,9 @@ export class Cloud {
     render();
   }
 
-  initialize(graph) {
+  initialize(graph, keywords) {
     this.graph = graph;
+    this.keywords = keywords;
   }
 
   setYear(year) {
@@ -228,11 +231,14 @@ export class Cloud {
     const maxPointsShown = 2500;
     let shown = 0;
     const particles = this.parentContainer.children;
+    const selectedList = !!this.keywords.selected && new Set(this.keywords.papersKeywords.papers[this.keywords.selected] || []);
     for (let i = 0; i < particles.length; i++) {
       const particle = particles[i];
+      const data = particle.userData;
       const visible = shown < maxPointsShown
-        && (this.year === ALL || particle.userData.year === this.year);
-      const transparent = !!selectedCategory && !particle.userData.categories.includes(selectedCategory.id);
+        && (this.year === ALL || data.year === this.year);
+      const transparent = (!!selectedCategory && !data.categories.includes(selectedCategory.id))
+        || (!!this.keywords.selected && !selectedList.has(data.id));
       particle.visible = visible;
       if (visible) {
         shown++;
