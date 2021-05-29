@@ -60,9 +60,9 @@
       </div>
       <div class="col-span-2 row-span-7 relative text-center table h-full">
         <div class="inline-flex relative">
-          <h3>Graph of paper categories</h3>
-          <div onmouseenter="showElement('#categories-graph-info')" onmouseleave="hideElement('#categories-graph-info')" class="inline-flex items-center justify-center text-center w-1 h-1 rounded-full shadow-sm hover:bg-gray-200 p-2.5 bg-gray-300 select-none cursor-help ml-3 mt-0.5">
-            <span class="text-sm font-medium text-white">i</span>
+          <span class="text-xs font-semibold">Graph of paper categories</span>
+          <div onmouseenter="showElement('#categories-graph-info')" onmouseleave="hideElement('#categories-graph-info')" class="inline-flex items-center justify-center text-center w-0.5 h-0.5 rounded-full shadow-sm hover:bg-gray-200 p-2 bg-gray-300 select-none cursor-help ml-2">
+            <span class="text-xs font-medium text-white">i</span>
           </div>
             <div class="rounded-md border bg-gray-50 absolute -right-full top-6 w-full p-3 z-20 select-none hidden" id="categories-graph-info">
               <p class="text-sm">This is a weighted graph of all categories of papers in the arXiv database. The edges are proportional to the number of papers having the two categories at the same time. You can <span class="font-bold">click</span> and <span class="font-bold">drag</span> the nodes. When you click or hover a node you can see the adjacent categories and additional statistics below.</p>
@@ -84,11 +84,11 @@
       </div>
       <div class="col-span-2 row-span-7 overflow-hidden text-center relative table h-full">
         <div class="inline-flex relative">
-          <h3>Cloud of papers</h3>
-          <div onmouseenter="showElement('#papers-cloud-info')" onmouseleave="hideElement('#papers-cloud-info')" class="inline-flex items-center justify-center text-center w-1 h-1 rounded-full shadow-sm hover:bg-gray-200 p-2.5 bg-gray-300 select-none cursor-help ml-3 mt-0.5">
+          <span class="text-xs font-semibold">Cloud of papers</span>
+          <div onmouseenter="showElement('#papers-cloud-info')" onmouseleave="hideElement('#papers-cloud-info')" class="inline-flex items-center justify-center text-center w-0.5 h-0.5 rounded-full shadow-sm hover:bg-gray-200 p-2 bg-gray-300 select-none cursor-help ml-2">
             <span class="text-sm font-medium text-white">i</span>
           </div>
-          <div class="rounded-md border bg-gray-50 absolute -right-full top-6 w-full p-3 z-20 select-none hidden" id="papers-cloud-info">
+          <div class="rounded-md border bg-gray-50 absolute -right-full top-6 p-3 z-20 select-none hidden" id="papers-cloud-info">
             <p class="text-sm">Each point represents a paper which you can either <span class="font-bold">click</span> on to reveal its name and categories or <span class="font-bold">search</span> in the bar below to discover its position. The cloud was built using PCA on the title/abstract.</p>
           </div>
         </div>
@@ -103,9 +103,35 @@
         </div>
         <div id="papers-cloud" class="w-full h-full table-row"></div>
       </div>
-      <div id="similar-bar" class="col-span-1 row-span-4 w-full h-full overflow-hidden"></div>
-      <div id="published-line" class="col-span-1 row-span-4 w-full h-full overflow-hidden"></div>
-      <div class="col-span-2 row-span-4 relative w-full h-full overflow-hidden">
+      <div id="similar-bar" class="col-span-1 row-span-4 w-full h-full overflow-hidden text-center relative">
+        <div class="inline-flex">
+          <span class="text-xs font-semibold">Bar chart of similar categories</span>
+          <div onmouseenter="showElement('#similar-bar-info')" onmouseleave="hideElement('#similar-bar-info')" class="inline-flex items-center justify-center text-center w-0.5 h-0.5 rounded-full shadow-sm hover:bg-gray-200 p-2 bg-gray-300 select-none cursor-help ml-2">
+            <span class="text-sm font-medium text-white">i</span>
+          </div>
+          <div class="rounded-md border bg-gray-50 absolute w-2/3 right-0 top-6 p-3 z-20 select-none hidden" id="similar-bar-info">
+            <p class="text-sm"> Once you <span class="font-bold">click</span> on a node from the graph above, a bar plot is displayed that shows the weighted proportion of categories related to the selected category. The color palette of the bars corresponds to the one of the graph.</p>
+          </div>
+        </div>
+      </div>
+      <div id="published-line" class="col-span-1 row-span-4 w-full h-full overflow-hidden text-center">
+        <div class="inline-flex relative">
+          <span class="text-xs font-semibold">Line chart of published papers</span>
+          <div onmouseenter="showElement('#published-line-info')" onmouseleave="hideElement('#published-line-info')" class="inline-flex items-center justify-center text-center w-0.5 h-0.5 rounded-full shadow-sm hover:bg-gray-200 p-2 bg-gray-300 select-none cursor-help ml-2">
+            <span class="text-sm font-medium text-white">i</span>
+          </div>
+          <div class="rounded-md border bg-gray-50 absolute left-0 top-6 w-full p-3 z-20 select-none hidden" id="published-line-info">
+            <p class="text-sm">Once you <span class="font-bold">click</span> on a node from the graph above, a line plot is displayed that shows the proportion of papers published in the selected category per time interval. </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-span-2 row-span-4 relative w-full h-full overflow-hidden relative">
+          <div onmouseenter="showElement('#keywords-info')" onmouseleave="hideElement('#keywords-info')" class="inline-flex items-center justify-center text-center w-0.5 h-0.5 rounded-full shadow-sm hover:bg-gray-200 p-2 bg-gray-300 select-none cursor-help absolute top-0 right-10">
+            <span class="text-sm font-medium text-white">i</span>
+          </div>
+          <div class="rounded-md border bg-gray-50 absolute right-10 top-5 w-2/3 p-3 z-20 select-none hidden" id="keywords-info">
+            <p class="text-sm">This is a cloud of the most used keywords in all the papers' abstracts. It can be filtered by selecting a time period in the slider and a category in the graph. By <span class="font-bold">clicking</span> on a keyword the corresponding papers are highlighted in the cloud above.</p>
+          </div>
         <span id="keywords-placeholder" class="absolute left-1/2 top-1/2 text-lg text-gray-500 select-none hidden" style="transform: translate(-50%, -50%)">Not enough data</span>
         <div id="keywords" class="w-full h-full"></div>
       </div>

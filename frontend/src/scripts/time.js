@@ -72,7 +72,7 @@ export class LinePlot {
       .attr('transform', 'translate(' + (widthChart / 2 + margin.left) + ' , ' + (heightChart + margin.top + margin.bottom / 2) + ')')
       .style('text-anchor', 'middle')
       .style('font-weight', 'bold')
-      .style('font-size', '70%')
+      .style('font-size', '60%')
       .text('date');
 
     this.svg.append('g')
@@ -83,27 +83,27 @@ export class LinePlot {
       .attr('x', 0 - (heightChart / 2))
       .attr('y', 0)
       .style('font-weight', 'bold')
-      .style('font-size', '70%')
+      .style('font-size', '60%')
       .style('text-anchor', 'middle')
       .text('#papers');
 
-    if (this.dataLine.length != 0){
+    if (this.dataLine.length != 0) {
       const mainPath = this.svg
-      .datum(this.dataLine[0])
-      .append('path')
-      .attr('fill', 'none')
-      .attr('stroke', this.lineColor)
-      .attr('stroke-width', 1.5)
-      .attr('d', d => line(d['values']));
-
-      if (this.dataLine.length == 2){
-        this.svg
-        .datum(this.dataLine[1])
+        .datum(this.dataLine[0])
         .append('path')
         .attr('fill', 'none')
-        .attr('stroke', 'gray')
+        .attr('stroke', this.lineColor)
         .attr('stroke-width', 1.5)
         .attr('d', d => line(d['values']));
+
+      if (this.dataLine.length == 2) {
+        this.svg
+          .datum(this.dataLine[1])
+          .append('path')
+          .attr('fill', 'none')
+          .attr('stroke', 'gray')
+          .attr('stroke-width', 1.5)
+          .attr('d', d => line(d['values']));
       }
 
       const totalLength = mainPath.node().getTotalLength();

@@ -30,10 +30,10 @@ export class BarPlot {
 
     // X axis label
     this.svgBar.append('text')
-      .attr('transform', 'translate(' + (-2 * margin.left / 3) + ',' + (heightChart + margin.bottom / 2) + ')rotate(-45)')
+      .attr('transform', 'translate(' + (- margin.left / 2) + ',' + (heightChart + margin.bottom / 3) + ')rotate(-45)')
       .style('text-anchor', 'middle')
       .style('font-weight', 'bold')
-      .style('font-size', '70%')
+      .style('font-size', '60%')
       .text('categories');
 
     // Add Y axis
@@ -46,9 +46,9 @@ export class BarPlot {
     this.svgBar.append('text')
       .attr('transform', 'rotate(-90)')
       .attr('x', 0 - (heightChart / 2))
-      .attr('y', 0 - 2 * margin.left / 3)
+      .attr('y', 0 - margin.left / 3)
       .style('font-weight', 'bold')
-      .style('font-size', '70%')
+      .style('font-size', '60%')
       .style('text-anchor', 'middle')
       .text('weight ratios');
   }
@@ -78,7 +78,8 @@ export class BarPlot {
       .selectAll('text')
       .classed('axis-bottom-text', true)
       .attr('transform', 'translate(-10,0)rotate(-45)')
-      .style('text-anchor', 'end');
+      .style('text-anchor', 'end')
+      .style('font-size', '70%');
 
     // Bars
     this.svgBar.selectAll('mybar')

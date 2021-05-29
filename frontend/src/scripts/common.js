@@ -58,9 +58,9 @@ export const getCategoryIndexAndLabel = name => {
 };
 
 // TODO rename/clean that
-export const margin = { top: 10, right: 30, bottom: 70, left: 40 };
+export const margin = { top: 5, right: 30, bottom: 70, left: 40 };
 export const widthChart = 260 - margin.left - margin.right;
-export const heightChart = 250 - margin.top - margin.bottom;
+export const heightChart = 200 - margin.top - margin.bottom;
 
 export const categoriesColors = d3.schemeTableau10;
 
