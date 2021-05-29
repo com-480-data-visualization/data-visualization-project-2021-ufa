@@ -25,7 +25,12 @@ export class LinePlot {
 
   update() {
 
-    let mainLine = this.dataLine.length !== 0 ? this.dataLine[0]['values'] : [];
+    let basedLine = [];
+    if (this.dataLine.length == 2) {
+      basedLine =  this.dataLine[1]['values'];
+    } else if (this.dataLine.length == 1) {
+      basedLine = this.dataLine[0]['values'];
+    }
 
     //const { mean, deviation } = statsOf(this.dataLine.map(o => o.value));
 
@@ -51,14 +56,14 @@ export class LinePlot {
         .attr('x', 3)
         .attr('text-anchor', 'start')
         .attr('font-weight', 'bold')
-        .text(mainLine.y));
+        .text(basedLine.y));
 
     let y = d3.scaleLinear()
       .domain([0, d3.max(this.dataLine, d => d3.max(d.values, l => l.value))]).nice()
       .range([heightChart, 0]);
 
     let x = d3.scaleTime()
-      .domain(d3.extent(mainLine, d => d.date))
+      .domain(d3.extent(basedLine, d => d.date))
       .range([margin.left, widthChart + margin.left]);
 
     let xAxis = g => g
