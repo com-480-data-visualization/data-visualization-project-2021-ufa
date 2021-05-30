@@ -143,8 +143,6 @@ export class BarPlot {
       tooltip.classed('hidden', !hoveredBar);
     };
 
-    // (Math.round(num * 100) / 100).;
-
   }
 }
 

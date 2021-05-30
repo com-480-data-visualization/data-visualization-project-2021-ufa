@@ -39,6 +39,7 @@ export class Keywords {
 
   update() {
     this.container.selectAll('*').remove();
+    const tooltip = d3.select('#keywords-tooltip');
 
     const keywordsData = this.papersKeywords.keywords;
     const yearData = keywordsData[this.year];
@@ -122,5 +123,42 @@ export class Keywords {
     }
 
     this.placeholder.classed('hidden', shown);
+
+    let hoveredWord = null;
+    const keywords = this.container.select('svg').selectAll('text');
+    keywords
+      .on('mouseover', (_, d) => {
+        hoveredWord = d;
+        updateTooltip();
+      })
+      .on('mouseout', () => {
+        hoveredWord = null;
+        updateTooltip();
+      });
+
+    const updateTooltipPosition = () => {
+      const word = hoveredWord;
+      if (word) {
+        tooltip
+          .style('top', (word.y / this.height * this.container.node().clientHeight) + 'px')
+          .style('left', (word.x / this.width * this.container.node().clientWidth) + 'px');
+      }
+    };
+
+    const updateTooltip = () => {
+      updateTooltipPosition();
+      let count;
+      for (let i = 0; i < data.keywords.length; i++)
+        if (data.keywords[i][0] === hoveredWord.text)
+          count = data.keywords[i][1];
+
+      //d3.select('#keywords-tooltip-id').text(hoveredBar && hoveredBar.id).style('color', hoveredBar && color(hoveredBar));
+      d3.select('#keywords-tooltip-category').text(hoveredWord && this.category);
+      d3.select('#keywords-tooltip-year').text(hoveredWord && this.year);
+      d3.select('#keywords-tooltip-count').text(hoveredWord && count);
+
+      tooltip.classed('hidden', !hoveredWord);
+    };
+
   }
 }
