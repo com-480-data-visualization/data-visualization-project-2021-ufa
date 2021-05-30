@@ -103,7 +103,7 @@
         </div>
         <div id="papers-cloud" class="w-full h-full table-row"></div>
       </div>
-      <div id="similar-bar" class="col-span-1 row-span-4 w-full h-full overflow-hidden text-center relative">
+      <div id="similar-bar" class="col-span-1 row-span-4 w-full h-full text-center relative">
         <div class="inline-flex">
           <span class="text-xs font-semibold">Bar chart of similar categories</span>
           <div onmouseenter="showElement('#similar-bar-info')" onmouseleave="hideElement('#similar-bar-info')" class="inline-flex items-center justify-center text-center w-0.5 h-0.5 rounded-full shadow-sm hover:bg-gray-200 p-2 bg-gray-300 select-none cursor-help ml-2">
@@ -111,6 +111,19 @@
           </div>
           <div class="rounded-md border bg-gray-50 absolute w-2/3 right-0 top-6 p-3 z-20 select-none hidden" id="similar-bar-info">
             <p class="text-sm"> Once you <span class="font-bold">click</span> on a node from the graph above, a bar plot is displayed that shows the weighted proportion of categories related to the selected category. The color palette of the bars corresponds to the one of the graph.</p>
+          </div>
+        </div>
+        <div id="bar-tooltip" class="absolute w-min pointer-events-none opacity-90 hidden" style="transform: translate(0%, -80%)">
+          <div class="bg-black text-white text-sm rounded py-1 px-4 right-0 bottom-full text-center max-w-xl">
+            <span id="bar-tooltip-id" class="block whitespace-nowrap overflow-hidden overflow-ellipsis text-glow"></span>
+            <span id="bar-tooltip-name" class="block whitespace-nowrap overflow-hidden overflow-ellipsis font-bold"></span>
+            <span id="bar-tooltip-percent" class="block whitespace-nowrap overflow-hidden overflow-ellipsis"></span>
+            <span class="block whitespace-nowrap overflow-hidden overflow-ellipsis">
+              <span id="bar-tooltip-count"></span>
+              papers
+            </span>
+            <svg class="absolute text-black h-2 w-full left-0 top-full" x="0px" y="0px" viewBox="0 0 255 255"
+                 xml:space="preserve"><polygon class="fill-current" points="0,0 127.5,127.5 255,0"/></svg>
           </div>
         </div>
       </div>

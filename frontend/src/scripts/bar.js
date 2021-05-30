@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { color, heightChart, margin, widthChart } from './common';
+import { color, heightChart, margin, widthChart, getCategoryIndexAndLabel } from './common';
 
 export const SIMILARITY_BAR_N = 5;
 
@@ -53,8 +53,10 @@ export class BarPlot {
       .text('weight ratios');
   }
 
-  setData(dataBar) {
+  setData(dataBar, categoriesNames, categoriesCounts) {
     this.dataBar = dataBar;
+    this.categoriesNames = categoriesNames;
+    this.categoriesCounts = categoriesCounts;
     this.update();
   }
 
@@ -65,6 +67,8 @@ export class BarPlot {
     this.svgBar.selectAll('rect').remove();
     this.svgBar.selectAll('.axis-bottom-text').remove();
     this.svgBar.selectAll('.tick').remove();
+
+    const tooltip = d3.select('#bar-tooltip');
 
     this.x = d3.scaleBand()
       .range([0, widthChart])
@@ -96,12 +100,51 @@ export class BarPlot {
     const hundred = 100;
 
     // Animation
+
+
     this.svgBar.selectAll('rect')
       .transition()
       .duration(200)
       .attr('y', d => this.y(d.weightRatio * hundred))
       .attr('height', d => heightChart - this.y(d.weightRatio * hundred))
       .delay((d, i) => (i * 50));
+
+    let hoveredBar = null;
+    const bars = this.svgBar.selectAll('rect');
+    bars
+      .on('mouseover', (_, d) => {
+        hoveredBar = d;
+        updateTooltip();
+      })
+      .on('mouseout', () => {
+        hoveredBar = null;
+        updateTooltip();
+      });
+
+    const updateTooltipPosition = () => {
+      const bar = hoveredBar;
+      if (bar) {
+        tooltip
+          .style('bottom', ((heightChart - this.y(bar.weightRatio * hundred)) + 'px'))
+          .style('left', (this.x(bar.id)) + 'px');
+      }
+    };
+
+    const updateTooltip = () => {
+      updateTooltipPosition();
+
+      d3.select('#bar-tooltip-id').text(hoveredBar && hoveredBar.id).style('color', hoveredBar && color(hoveredBar));
+      d3.select('#bar-tooltip-name').text(hoveredBar &&
+          (this.categoriesNames[hoveredBar.id] || getCategoryIndexAndLabel(hoveredBar.id).label));
+      d3.select('#bar-tooltip-percent').text(hoveredBar &&
+            (hoveredBar.weightRatio * hundred).toFixed(2) + '%');
+      d3.select('#bar-tooltip-count').text(hoveredBar && this.categoriesCounts[hoveredBar.id].toLocaleString());
+
+      tooltip.classed('hidden', !hoveredBar);
+    };
+
+    // (Math.round(num * 100) / 100).;
+
   }
 }
 

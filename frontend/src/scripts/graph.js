@@ -135,7 +135,7 @@ export class Graph {
       gNodes.attr('stroke', d => this.selectedNode === d ? 'black' : variables['background-color']);
       gLinks.classed('hidden', node ? d => d.source.id !== node.id && d.target.id !== node.id : false);
 
-      this.barPlot.setData(connectedWeightRatios);
+      this.barPlot.setData(connectedWeightRatios, this.categoriesNames, this.categoriesCounts[this.year]);
       this.linePlot.setData(dataLine, node ? color(node) : '');
 
       this.cloud.update();
