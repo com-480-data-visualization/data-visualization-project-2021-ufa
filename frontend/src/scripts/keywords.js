@@ -148,9 +148,12 @@ export class Keywords {
     const updateTooltip = () => {
       updateTooltipPosition();
       let count;
-      for (let i = 0; i < data.keywords.length; i++)
-        if (data.keywords[i][0] === hoveredWord.text)
-          count = data.keywords[i][1];
+
+      if (hoveredWord) {
+        for (let i = 0; i < data.keywords.length; i++)
+          if (data.keywords[i][0] === hoveredWord.text)
+            count = data.keywords[i][1];
+      }
 
       //d3.select('#keywords-tooltip-id').text(hoveredBar && hoveredBar.id).style('color', hoveredBar && color(hoveredBar));
       d3.select('#keywords-tooltip-category').text(hoveredWord && this.category);
