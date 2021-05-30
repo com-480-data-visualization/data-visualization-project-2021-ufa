@@ -33,7 +33,7 @@ export class BarPlot {
       .attr('transform', 'translate(' + (- margin.left / 2) + ',' + (heightChart + margin.bottom / 3) + ')rotate(-45)')
       .style('text-anchor', 'middle')
       .style('font-weight', 'bold')
-      .style('font-size', '60%')
+      .style('font-size', '50%')
       .text('categories');
 
     // Add Y axis
@@ -48,7 +48,7 @@ export class BarPlot {
       .attr('x', 0 - (heightChart / 2))
       .attr('y', 0 - margin.left / 3)
       .style('font-weight', 'bold')
-      .style('font-size', '60%')
+      .style('font-size', '50%')
       .style('text-anchor', 'middle')
       .text('weight ratios');
   }

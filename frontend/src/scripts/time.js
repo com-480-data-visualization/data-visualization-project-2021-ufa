@@ -77,7 +77,7 @@ export class LinePlot {
       .attr('transform', 'translate(' + (widthChart / 2 + margin.left) + ' , ' + (heightChart + margin.top + margin.bottom / 2) + ')')
       .style('text-anchor', 'middle')
       .style('font-weight', 'bold')
-      .style('font-size', '60%')
+      .style('font-size', '50%')
       .text('date');
 
     this.svg.append('g')
@@ -88,9 +88,12 @@ export class LinePlot {
       .attr('x', 0 - (heightChart / 2))
       .attr('y', 0)
       .style('font-weight', 'bold')
-      .style('font-size', '60%')
+      .style('font-size', '50%')
       .style('text-anchor', 'middle')
       .text('#papers');
+
+    this.svg.selectAll('.tick').selectAll('text')
+      .style('font-size', '75%');
 
     if (this.dataLine.length != 0) {
       const mainPath = this.svg
