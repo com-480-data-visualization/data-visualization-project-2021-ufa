@@ -285,7 +285,7 @@ def main():
     print("Calculating and writing paper counts...")
     papers_expand = df.drop("categories", axis=1) \
         .join(df.categories.str.split(expand=True).stack().reset_index(drop=True, level=1).rename("categories"))
-    t_index = pd.DatetimeIndex(pd.date_range(start="2007", end="2021", freq="M"))
+    t_index = pd.DatetimeIndex(pd.date_range(start="2007", end="2020-12-01", freq="M"))
     paper_counts = papers_expand.groupby("categories") \
         .apply(lambda x: x.resample("M", on="update_date").size().reindex(t_index).fillna(0).astype("int32"))
     paper_counts = pd.DataFrame(paper_counts.stack()).reset_index()
