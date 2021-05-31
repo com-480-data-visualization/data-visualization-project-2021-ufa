@@ -9,10 +9,10 @@ export class BarPlot {
   constructor() {
     this.dataBar = [];
 
-    d3.select('#similar-bar').select('svg').remove();
+    this.container = d3.select('#similar-bar');
+    this.svg = this.container.append('svg');
 
-    this.svgBar = d3.select('#similar-bar')
-      .append('svg')
+    this.svgBar = this.svg
       .attr('viewBox', [0, 0, widthChart + margin.left + margin.right, heightChart + margin.top + margin.bottom].join(' '))
       .attr('class', 'max-w-full max-h-full')
       .append('g')
@@ -112,8 +112,15 @@ export class BarPlot {
     let hoveredBar = null;
     const bars = this.svgBar.selectAll('rect');
     bars
-      .on('mouseover', (_, d) => {
+      .on('mouseover', (e, d) => {
         hoveredBar = d;
+        const barRect = e.target.getBoundingClientRect();
+        const containerRect = this.container.node().getBoundingClientRect();
+
+        tooltip
+          .style('top', (barRect.top - containerRect.top) + 'px')
+          .style('left', (barRect.left - containerRect.left + barRect.width / 2) + 'px');
+
         updateTooltip();
       })
       .on('mouseout', () => {
@@ -121,18 +128,7 @@ export class BarPlot {
         updateTooltip();
       });
 
-    const updateTooltipPosition = () => {
-      const bar = hoveredBar;
-      if (bar) {
-        tooltip
-          .style('bottom', ((heightChart - this.y(bar.weightRatio * hundred)) + 'px'))
-          .style('left', (this.x(bar.id)) + 'px');
-      }
-    };
-
     const updateTooltip = () => {
-      updateTooltipPosition();
-
       d3.select('#bar-tooltip-id').text(hoveredBar && hoveredBar.id).style('color', hoveredBar && color(hoveredBar));
       d3.select('#bar-tooltip-name').text(hoveredBar &&
           (this.categoriesNames[hoveredBar.id] || getCategoryIndexAndLabel(hoveredBar.id).label));

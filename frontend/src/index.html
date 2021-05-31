@@ -113,7 +113,7 @@
             <p class="text-sm"> Once you <span class="font-bold">click</span> on a node from the graph above, a bar plot is displayed that shows the weighted proportion of categories related to the selected category. The color palette of the bars corresponds to the one of the graph.</p>
           </div>
         </div>
-        <div id="bar-tooltip" class="absolute w-min pointer-events-none opacity-90 hidden" style="transform: translate(15%, -80%)">
+        <div id="bar-tooltip" class="absolute w-min pointer-events-none opacity-90 hidden" style="transform: translate(-50%, -110%)">
           <div class="bg-black text-white text-sm rounded py-1 px-4 right-0 bottom-full text-center max-w-xl">
             <span id="bar-tooltip-id" class="block whitespace-nowrap overflow-hidden overflow-ellipsis text-glow"></span>
             <span id="bar-tooltip-name" class="block whitespace-nowrap overflow-hidden overflow-ellipsis font-bold"></span>
@@ -122,7 +122,7 @@
               <span id="bar-tooltip-count"></span>
               papers
             </span>
-            <svg class="absolute text-black h-2 w-full left-0 top-full" x="0px" y="0px" viewBox="0 0 255 255"
+            <svg id="arrow" class="absolute text-black h-2 w-full left-0 top-full" x="0px" y="0px" viewBox="0 0 255 255"
                  xml:space="preserve"><polygon class="fill-current" points="0,0 127.5,127.5 255,0"/></svg>
           </div>
         </div>
@@ -147,7 +147,7 @@
           </div>
         <span id="keywords-placeholder" class="absolute left-1/2 top-1/2 text-lg text-gray-500 select-none hidden" style="transform: translate(-50%, -50%)">Not enough data</span>
         <div id="keywords" class="w-full h-full"></div>
-        <div id="keywords-tooltip" class="absolute w-min pointer-events-none opacity-90 hidden" style="transform: translate(250%, 40%)">
+        <div id="keywords-tooltip" class="absolute w-min pointer-events-none opacity-90 hidden" style="transform: translate(-50%, -155%)">
           <div class="bg-black text-white text-sm rounded py-1 px-4 right-0 bottom-full text-center max-w-xl">
             <span class="block whitespace-nowrap overflow-hidden overflow-ellipsis text-glow">
               Category:

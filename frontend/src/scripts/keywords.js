@@ -140,8 +140,8 @@ export class Keywords {
       const word = hoveredWord;
       if (word) {
         tooltip
-          .style('top', (word.y / this.height * this.container.node().clientHeight) + 'px')
-          .style('left', (word.x / this.width * this.container.node().clientWidth) + 'px');
+          .style('top', ((word.y / this.height + 0.5) * this.container.node().clientHeight) + 'px')
+          .style('left', ((word.x / this.width + 0.5) * this.container.node().clientWidth) + 'px');
       }
     };
 
@@ -156,7 +156,7 @@ export class Keywords {
       }
 
       //d3.select('#keywords-tooltip-id').text(hoveredBar && hoveredBar.id).style('color', hoveredBar && color(hoveredBar));
-      d3.select('#keywords-tooltip-category').text(hoveredWord && this.category);
+      d3.select('#keywords-tooltip-category').text(hoveredWord && this.category).style('color', hoveredWord && color({ id: this.category }));
       d3.select('#keywords-tooltip-year').text(hoveredWord && this.year);
       d3.select('#keywords-tooltip-count').text(hoveredWord && count);
 
