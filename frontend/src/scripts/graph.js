@@ -235,6 +235,11 @@ export class Graph {
       updateHighlights();
     });
 
+    d3.select('#categories-graph-reset').on('click', () => {
+      this.selectedNode = null;
+      updateHighlights();
+    });
+
     this.container.node().append(this.svg.node());
 
     //invalidation.then(() => simulation.stop());

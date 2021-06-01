@@ -76,6 +76,12 @@ export class Keywords {
             this.cloud.update();
           });
 
+        d3.select('#keywords-reset').on('click', () => {
+          this.selected = null;
+          this.update();
+          this.cloud.update();
+        });
+
         svg
           .append('g')
           .attr('transform', 'translate(' + layout.size()[0] / 2 + ',' + layout.size()[1] / 2 + ')')

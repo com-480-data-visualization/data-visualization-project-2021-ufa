@@ -56,6 +56,19 @@ export class Slider {
       keywords.category = ALL; // Dirty
       keywords.update();
     });
+
+    d3.select('#slider-reset').on('click', () => {
+      console.log(this.sliderTime.value('2021'));
+      keywords.selected = null;
+
+      catGraph.setYear(ALL);
+      cloud.setYear(ALL);
+      barPlot.setData([]);
+      linePlot.setData([], '');
+      keywords.year = ALL;
+      keywords.category = ALL; // Dirty
+      keywords.update();
+    });
   }
 
   update() {
