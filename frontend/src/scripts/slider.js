@@ -50,10 +50,7 @@ export class Slider {
 
       catGraph.setYear(year);
       cloud.setYear(year);
-      barPlot.setData([]);
-      linePlot.setData([], '');
       keywords.year = year;
-      keywords.category = ALL; // Dirty
       keywords.update();
     });
 
@@ -63,10 +60,7 @@ export class Slider {
 
       catGraph.setYear(ALL);
       cloud.setYear(ALL);
-      barPlot.setData([]);
-      linePlot.setData([], '');
       keywords.year = ALL;
-      keywords.category = ALL; // Dirty
       keywords.update();
     });
   }
