@@ -227,7 +227,7 @@ export class Cloud {
   update() {
     this.tooltip.classed('hidden', true);
 
-    const selectedCategory = this.graph.selectedNode;
+    const selectedCategory = this.graph.selectedCategory;
     const maxPointsShown = 2500;
     let shown = 0;
     const particles = this.parentContainer.children;
@@ -237,7 +237,7 @@ export class Cloud {
       const data = particle.userData;
       const visible = shown < maxPointsShown
         && (this.year === ALL || data.year === this.year);
-      const transparent = (!!selectedCategory && !data.categories.includes(selectedCategory.id))
+      const transparent = (!!selectedCategory && !data.categories.includes(selectedCategory))
         || (!!this.keywords.selected && !selectedList.has(data.id));
       particle.visible = visible;
       if (visible) {

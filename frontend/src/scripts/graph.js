@@ -22,6 +22,8 @@ export class Graph {
     this.paperCounts = paperCounts;
 
     this.simulation = null;
+
+    this.selectedCategory = null;
   }
 
   initialize(cloud, barPlot, linePlot, keywords) {
@@ -59,7 +61,6 @@ export class Graph {
       .force('forceY', d3.forceY().strength(force * this.aspect))
       .force('center', d3.forceCenter(this.width / 2, this.height / 2));
 
-    this.selectedNode = null;
     let hoveredNode = null;
 
     const tooltip = d3.select('#graph-tooltip');
@@ -93,17 +94,17 @@ export class Graph {
     };
 
     const updateHighlights = () => {
-      const node = this.selectedNode;
+      const category = this.selectedCategory;
       const connectedSet = new Set();
       const connectedWeights = [];
       const dataLine = [];
-      if (node) {
-        connectedSet.add(node.id);
+      if (category) {
+        connectedSet.add(category);
         links.forEach(l => {
           let neighbour = null;
-          if (l.source.id === node.id) {
+          if (l.source.id === category) {
             neighbour = l.target.id;
-          } else if (l.target.id === node.id) {
+          } else if (l.target.id === category) {
             neighbour = l.source.id;
           }
           if (neighbour) {
@@ -111,15 +112,15 @@ export class Graph {
             connectedWeights.push({ id: neighbour, weight: l.weight });
           }
         });
-        let items = this.paperCounts[node.id][this.year]['count'];
-        let date = this.paperCounts[node.id][this.year]['date'];
+        let items = this.paperCounts[category][this.year]['count'];
+        let date = this.paperCounts[category][this.year]['date'];
         let currValues = [];
         items.forEach((item, i) => (currValues.push({ date: sameYearDate(date[i], this.year), value: item })));
         dataLine.push({ 'time': this.year, 'values': currValues });
 
         if (this.year !== ALL) {
-          items = this.paperCounts[node.id]['mean']['count'];
-          date = this.paperCounts[node.id]['mean']['date'];
+          items = this.paperCounts[category]['mean']['count'];
+          date = this.paperCounts[category]['mean']['date'];
           currValues = [];
           items.forEach((item, i) => (currValues.push({ date: new Date(2000, date[i], 0), value: item })));
           dataLine.push({ 'time': 'mean', 'values': currValues });
@@ -131,15 +132,15 @@ export class Graph {
         .sort((x, y) => d3.descending(x.weightRatio, y.weightRatio))
         .slice(0, SIMILARITY_BAR_N);
 
-      gNodes.classed('opacity-10', node ? d => !connectedSet.has(d.id) : false);
-      gNodes.attr('stroke', d => this.selectedNode === d ? 'black' : variables['background-color']);
-      gLinks.classed('hidden', node ? d => d.source.id !== node.id && d.target.id !== node.id : false);
+      gNodes.classed('opacity-10', category ? d => !connectedSet.has(d.id) : false);
+      gNodes.attr('stroke', d => this.selectedCategory !== null && this.selectedCategory === d.id ? 'black' : variables['background-color']);
+      gLinks.classed('hidden', category ? d => d.source.id !== category && d.target.id !== category : false);
 
       this.barPlot.setData(connectedWeightRatios, this.categoriesNames, this.categoriesCounts[this.year]);
-      this.linePlot.setData(dataLine, node ? color(node) : '');
+      this.linePlot.setData(dataLine, category ? color({ id: category }) : '');
 
       this.cloud.update();
-      this.keywords.setCategory(this.selectedNode ? this.selectedNode.id : ALL);
+      this.keywords.setCategory(this.selectedCategory ? this.selectedCategory : ALL);
     };
 
     const gClusters = this.svg.append('g')
@@ -221,19 +222,21 @@ export class Graph {
         updateTooltip();
       })
       .on('click', (event, d) => {
-        if (d !== this.selectedNode) {
-          this.selectedNode = d;
+        if (d.id !== this.selectedCategory) {
+          this.selectedCategory = d.id;
         } else {
-          this.selectedNode = null;
+          this.selectedCategory = null;
         }
         updateHighlights();
         event.stopPropagation(); // The event won't trigger on parent elements
       });
 
     this.svg.on('click', () => {
-      this.selectedNode = null;
+      this.selectedCategory = null;
       updateHighlights();
     });
+
+    updateHighlights(); // Initial update
 
     this.container.node().append(this.svg.node());
 
