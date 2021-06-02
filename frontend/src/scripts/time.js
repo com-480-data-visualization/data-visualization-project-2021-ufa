@@ -111,7 +111,17 @@ export class LinePlot {
           .attr('fill', 'none')
           .attr('stroke', 'gray')
           .attr('stroke-width', 1.5)
-          .attr('d', d => line(d['values']));
+          .attr('d', d => line(d['values']))
+          .attr('id', 'meanLine');
+
+        this.svg.append('text')
+          .style('font-size', '10px')
+          .append('textPath')
+          .attr('xlink:href', '#meanLine')
+          .style('text-anchor', 'end')
+          .attr('startOffset', '100%')
+          .attr('fill', 'gray')
+          .text('mean');
       }
 
       const totalLength = mainPath.node().getTotalLength();
