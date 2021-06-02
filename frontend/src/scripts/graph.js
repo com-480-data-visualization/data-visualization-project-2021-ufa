@@ -24,6 +24,8 @@ export class Graph {
     this.simulation = null;
 
     this.selectedCategory = null;
+
+    this.initializedYears = new Set([ALL]);
   }
 
   initialize(cloud, barPlot, linePlot, keywords) {
@@ -51,6 +53,24 @@ export class Graph {
 
     const links = this.graphData[this.year].links;
     const nodes = this.graphData[this.year].nodes;
+
+    if (!this.initializedYears.has(this.year)) { // Preserve the shape of the graph across years
+      this.initializedYears.add(this.year);
+      const props = ['x', 'y', 'vx', 'vy'];
+      const refNodes = this.graphData[ALL].nodes;
+      const nodesById = Object.fromEntries(nodes.map(obj => [obj.id, obj]));
+      refNodes.map(refNode => {
+        const node = nodesById[refNode.id];
+        if (node) {
+          props.forEach(prop => {
+            const value = refNode[prop];
+            if (value) {
+              node[prop] = value;
+            }
+          });
+        }
+      });
+    }
 
     const force = 0.1;
     const charge = 150;
