@@ -26,9 +26,9 @@ export class LinePlot {
   update() {
 
     let basedLine = [];
-    if (this.dataLine.length == 2) {
+    if (this.dataLine.length === 2) {
       basedLine =  this.dataLine[1]['values'];
-    } else if (this.dataLine.length == 1) {
+    } else if (this.dataLine.length === 1) {
       basedLine = this.dataLine[0]['values'];
     }
 
@@ -95,7 +95,7 @@ export class LinePlot {
     this.svg.selectAll('.tick').selectAll('text')
       .style('font-size', '75%');
 
-    if (this.dataLine.length != 0) {
+    if (this.dataLine.length !== 0) {
       const mainPath = this.svg
         .datum(this.dataLine[0])
         .append('path')
@@ -104,7 +104,7 @@ export class LinePlot {
         .attr('stroke-width', 1.5)
         .attr('d', d => line(d['values']));
 
-      if (this.dataLine.length == 2) {
+      if (this.dataLine.length === 2) {
         this.svg
           .datum(this.dataLine[1])
           .append('path')
@@ -115,11 +115,10 @@ export class LinePlot {
           .attr('id', 'meanLine');
 
         this.svg.append('text')
-          .style('font-size', '10px')
-          .append('textPath')
-          .attr('xlink:href', '#meanLine')
+          .attr('x', margin.left + widthChart - 5) // The '5' is just an extra margin
+          .attr('y', y(this.dataLine[1].values[this.dataLine[1].values.length - 1].value) + margin.top)
+          .style('font-size', '8px')
           .style('text-anchor', 'end')
-          .attr('startOffset', '100%')
           .attr('fill', 'gray')
           .text('mean');
       }
