@@ -38,6 +38,18 @@ export class Keywords {
   }
 
   update() {
+    const keywordReset = d3.select('#keywords-reset');
+    if (this.selected !== null) {
+      keywordReset.classed('hidden', false);
+    } else {
+      keywordReset.classed('hidden', true);
+    }
+    keywordReset.on('click', () => {
+      this.selected = null;
+      this.update();
+      this.cloud.update();
+    });
+
     this.container.selectAll('*').remove();
     const tooltip = d3.select('#keywords-tooltip');
 
@@ -75,12 +87,6 @@ export class Keywords {
             this.update();
             this.cloud.update();
           });
-
-        d3.select('#keywords-reset').on('click', () => {
-          this.selected = null;
-          this.update();
-          this.cloud.update();
-        });
 
         svg
           .append('g')

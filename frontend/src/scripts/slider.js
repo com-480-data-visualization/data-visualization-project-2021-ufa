@@ -43,8 +43,15 @@ export class Slider {
   }
 
   initialize(catGraph, cloud, barPlot, linePlot, keywords) {
+    const sliderReset = d3.select('#slider-reset');
+
     this.sliderTime.on('end', val => {
       const year = val === this.tickAllTime ? ALL : val;
+      if (year !== ALL) {
+        sliderReset.classed('hidden', false);
+      } else {
+        sliderReset.classed('hidden', true);
+      }
 
       keywords.selected = null;
 
@@ -54,8 +61,9 @@ export class Slider {
       keywords.update();
     });
 
-    d3.select('#slider-reset').on('click', () => {
+    sliderReset.on('click', () => {
       console.log(this.sliderTime.value('2021'));
+      sliderReset.classed('hidden', true);
       keywords.selected = null;
 
       catGraph.setYear(ALL);
