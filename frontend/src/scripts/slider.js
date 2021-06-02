@@ -47,11 +47,8 @@ export class Slider {
 
     this.sliderTime.on('end', val => {
       const year = val === this.tickAllTime ? ALL : val;
-      if (year !== ALL) {
-        sliderReset.classed('hidden', false);
-      } else {
-        sliderReset.classed('hidden', true);
-      }
+
+      sliderReset.classed('invisible', year === ALL);
 
       keywords.selected = null;
 
@@ -62,8 +59,9 @@ export class Slider {
     });
 
     sliderReset.on('click', () => {
-      console.log(this.sliderTime.value('2021'));
-      sliderReset.classed('hidden', true);
+      this.sliderTime.value('2021');
+
+      sliderReset.classed('invisible', true);
       keywords.selected = null;
 
       catGraph.setYear(ALL);

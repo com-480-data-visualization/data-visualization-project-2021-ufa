@@ -143,11 +143,7 @@ export class Graph {
       this.keywords.setCategory(this.selectedCategory ? this.selectedCategory : ALL);
       const graphReset = d3.select('#categories-graph-reset');
       //console.log(this.selectedCategory);
-      if (this.selectedCategory !== null) {
-        graphReset.classed('hidden', false);
-      } else {
-        graphReset.classed('hidden', true);
-      }
+      graphReset.classed('invisible', this.selectedCategory === null);
     };
 
     const gClusters = this.svg.append('g')

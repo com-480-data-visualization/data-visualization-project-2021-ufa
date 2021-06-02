@@ -39,11 +39,8 @@ export class Keywords {
 
   update() {
     const keywordReset = d3.select('#keywords-reset');
-    if (this.selected !== null) {
-      keywordReset.classed('hidden', false);
-    } else {
-      keywordReset.classed('hidden', true);
-    }
+    keywordReset.classed('invisible', this.selected === null);
+
     keywordReset.on('click', () => {
       this.selected = null;
       this.update();
