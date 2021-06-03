@@ -53,6 +53,10 @@ export class BarPlot {
       .text('weight ratios');
   }
 
+  initialize(graph) {
+    this.graph = graph;
+  }
+
   setData(dataBar, categoriesNames, categoriesCounts) {
     this.dataBar = dataBar;
     this.categoriesNames = categoriesNames;
@@ -96,7 +100,13 @@ export class BarPlot {
       // no bar at the beginning thus:
       .attr('height', () => heightChart - this.y(0)) // always equal to 0
       .attr('y', () =>  this.y(0))
-      .attr('class', d => d3.select('#catGraph-' + d.id).empty() ? 'cursor-default' : 'cursor-pointer');
+      .classed('cursor-pointer', true)
+      .on('click', (_, d) => {
+        this.graph.selectedCategory = d.id;
+        this.graph.update();
+        hoveredBar = null;
+        updateTooltip();
+      });
 
     const hundred = 100;
 
@@ -127,13 +137,6 @@ export class BarPlot {
       .on('mouseout', () => {
         hoveredBar = null;
         updateTooltip();
-      }).on('click', (event, d) => {
-        const selectedBar = d3.select('#catGraph-' + d.id);
-        if (!selectedBar.empty()) {
-          selectedBar.on('click')(event, d);
-          hoveredBar = null;
-          updateTooltip();
-        }
       });
 
     const updateTooltip = () => {

@@ -37,6 +37,7 @@ Promise.all([
   slider.initialize(catGraph, cloud, barPlot, linePlot, keywords);
   catGraph.initialize(cloud, barPlot, linePlot, keywords);
   cloud.initialize(catGraph, keywords);
+  barPlot.initialize(catGraph);
   keywords.initialize(cloud);
 
   // Initial update (required)
