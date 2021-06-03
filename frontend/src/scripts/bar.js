@@ -53,6 +53,10 @@ export class BarPlot {
       .text('weight ratios');
   }
 
+  initialize(graph) {
+    this.graph = graph;
+  }
+
   setData(dataBar, categoriesNames, categoriesCounts) {
     this.dataBar = dataBar;
     this.categoriesNames = categoriesNames;
@@ -95,7 +99,12 @@ export class BarPlot {
       .attr('fill', color)
       // no bar at the beginning thus:
       .attr('height', () => heightChart - this.y(0)) // always equal to 0
-      .attr('y', () =>  this.y(0));
+      .attr('y', () =>  this.y(0))
+      .classed('cursor-pointer', true)
+      .on('click', (_, d) => {
+        this.graph.selectedCategory = d.id;
+        this.graph.update();
+      });
 
     const hundred = 100;
 

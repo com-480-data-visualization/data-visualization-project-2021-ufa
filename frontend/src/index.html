@@ -41,7 +41,7 @@
       </div>
     </div>
   </div>
-  <div class="h-screen">
+  <div class="h-screen overflow-hidden">
     <div class="grid grid-cols-4 grid-rows-12 gap-4 h-full">
       <div class="col-start-2 col-span-2 row-span-1 content-center z-10 relative">
         <div onmouseenter="showElement('#slider-info')" onmouseleave="hideElement('#slider-info')" class="inline-flex items-center justify-center text-center absolute top-2 -right-5 w-1 h-1 rounded-full shadow-sm hover:bg-gray-200 p-2.5 bg-gray-300 select-none cursor-help">
@@ -76,7 +76,7 @@
               <path transform="matrix(.12785 0 0 .12786 2.95 2.948)" d="m120.6 38.723c-3.312-7.713-7.766-14.367-13.36-19.961-5.595-5.594-12.248-10.05-19.962-13.361-7.713-3.314-15.805-4.97-24.278-4.97-7.984 0-15.71 1.506-23.18 4.521-7.468 3.01-14.11 7.265-19.92 12.751l-10.593-10.511c-1.63-1.684-3.503-2.064-5.622-1.141-2.173.924-3.259 2.527-3.259 4.808v36.5c0 1.412.516 2.634 1.548 3.666 1.033 1.032 2.255 1.548 3.667 1.548h36.5c2.282 0 3.884-1.086 4.807-3.259.923-2.118.543-3.992-1.141-5.622l-11.162-11.243c3.803-3.585 8.148-6.341 13.04-8.27 4.889-1.928 9.994-2.893 15.317-2.893 5.649 0 11.04 1.101 16.17 3.3 5.133 2.2 9.572 5.174 13.32 8.922 3.748 3.747 6.722 8.187 8.922 13.32 2.199 5.133 3.299 10.523 3.299 16.17 0 5.65-1.1 11.04-3.299 16.17-2.2 5.133-5.174 9.573-8.922 13.321-3.748 3.748-8.188 6.722-13.32 8.921-5.133 2.2-10.525 3.3-16.17 3.3-6.464 0-12.574-1.412-18.332-4.236-5.757-2.824-10.618-6.816-14.583-11.977-.38-.543-1-.87-1.874-.979-.815 0-1.494.244-2.037.733l-11.162 11.244c-.434.436-.665.991-.692 1.67-.027.68.15 1.29.53 1.833 5.921 7.17 13.09 12.724 21.509 16.661 8.419 3.937 17.3 5.907 26.642 5.907 8.473 0 16.566-1.657 24.279-4.97 7.713-3.313 14.365-7.768 19.961-13.361 5.594-5.596 10.05-12.248 13.361-19.961 3.313-7.713 4.969-15.807 4.969-24.279 0-8.474-1.657-16.564-4.97-24.277" />
             </svg>
         </div>
-        <div id="graph-tooltip" class="absolute w-min pointer-events-none opacity-90 hidden" style="transform: translate(-50%, -80%)">
+        <div id="graph-tooltip" class="absolute w-min pointer-events-none opacity-90 z-30 hidden" style="transform: translate(-50%, -80%)">
           <div class="bg-black text-white text-sm rounded py-1 px-4 right-0 bottom-full text-center max-w-xl">
             <span id="categories-selected-category" class="block whitespace-nowrap overflow-hidden overflow-ellipsis text-glow"></span>
             <span id="categories-selected-field" class="block whitespace-nowrap overflow-hidden overflow-ellipsis font-bold"></span>
@@ -100,7 +100,7 @@
             <p class="text-sm">Each point represents a paper which you can <span class="font-bold">click</span> on to reveal its name and categories. The cloud was built using PCA on the title/abstract.</p>
           </div>
         </div>
-        <div id="cloud-tooltip" class="absolute w-min left-1/2 top-1/2 opacity-90 hidden" style="transform: translate(-50%, -100%)">
+        <div id="cloud-tooltip" class="absolute w-min left-1/2 top-1/2 opacity-90 z-30 hidden" style="transform: translate(-50%, -100%)">
           <div class="bg-black text-white text-sm rounded py-1 px-4 right-0 bottom-full text-center max-w-xl">
             <a href="#" target="_blank" id="cloud-tooltip-link" class="block whitespace-nowrap underline"></a>
             <span id="cloud-tooltip-description" class="block whitespace-nowrap overflow-hidden overflow-ellipsis font-bold"></span>
@@ -111,7 +111,7 @@
         </div>
         <div id="papers-cloud" class="w-full h-full table-row"></div>
       </div>
-      <div id="similar-bar" class="col-span-1 row-span-4 w-full h-full overflow-hidden text-center relative">
+      <div id="similar-bar" class="col-span-1 row-span-4 w-full h-full overflow-visible text-center relative">
         <div class="inline-flex">
           <span class="text-xs">Distribution of similar categories</span>
           <div onmouseenter="showElement('#similar-bar-info')" onmouseleave="hideElement('#similar-bar-info')" class="inline-flex items-center justify-center text-center w-0.5 h-0.5 rounded-full shadow-sm hover:bg-gray-200 p-2 bg-gray-300 select-none cursor-help ml-2">
@@ -121,7 +121,7 @@
             <p class="text-sm"> Once you <span class="font-bold">click</span> on a node from the graph above, a bar plot is displayed that shows the weighted proportion of categories related to the selected category. The color palette of the bars corresponds to the one of the graph.</p>
           </div>
         </div>
-        <div id="bar-tooltip" class="absolute w-min pointer-events-none opacity-90 hidden" style="transform: translate(-50%, -110%)">
+        <div id="bar-tooltip" class="absolute w-min pointer-events-none opacity-90 z-30 hidden" style="transform: translate(-50%, -110%)">
           <div class="bg-black text-white text-sm rounded py-1 px-4 right-0 bottom-full text-center max-w-xl">
             <span id="bar-tooltip-id" class="block whitespace-nowrap overflow-hidden overflow-ellipsis text-glow"></span>
             <span id="bar-tooltip-name" class="block whitespace-nowrap overflow-hidden overflow-ellipsis font-bold"></span>
@@ -159,7 +159,7 @@
           </svg>
         <span id="keywords-placeholder" class="absolute left-1/2 top-1/2 text-lg text-gray-500 select-none hidden" style="transform: translate(-50%, -50%)">Not enough data</span>
         <div id="keywords" class="w-full h-full"></div>
-        <div id="keywords-tooltip" class="absolute w-min pointer-events-none opacity-90 hidden" style="transform: translate(-50%, -155%)">
+        <div id="keywords-tooltip" class="absolute w-min pointer-events-none opacity-90 z-30 hidden" style="transform: translate(-50%, -155%)">
           <div class="bg-black text-white text-sm rounded py-1 px-4 right-0 bottom-full text-center max-w-xl">
             <span class="block whitespace-nowrap overflow-hidden overflow-ellipsis text-glow">
               Category:
