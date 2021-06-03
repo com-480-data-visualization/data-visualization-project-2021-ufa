@@ -51,6 +51,7 @@ export class Cloud {
     this.tooltip = d3.select('#cloud-tooltip');
     this.tooltipLink = d3.select('#cloud-tooltip-link');
     this.tooltipDescription = d3.select('#cloud-tooltip-description');
+    this.tooltipAuthors = d3.select('#cloud-tooltip-authors');
     this.tooltipCategories = d3.select('#cloud-tooltip-categories');
 
     this.scene = new THREE.Scene();
@@ -174,13 +175,24 @@ export class Cloud {
           this.tooltip.classed('hidden', false);
           this.tooltipLink.text(id).attr('href', urlForPaper(id));
           this.tooltipDescription.text('...');
+          this.tooltipAuthors.text('...');
           this.tooltipCategories.text('...');
+
 
           getPaperMetadata(id).then(xml => {
             if (this.selectedObject !== null && this.selectedObject.userData.id === id) { // Verify that the object is still selected
               const entry = xml.querySelector('feed > entry');
               const title = entry.querySelector('title');
+              const authors = entry.querySelectorAll('author');
+              let authorsNames = '';
+
+              for (let i = 0; i < authors.length; i++) {
+                authorsNames += (authors[i].querySelector('name').textContent + ', ');
+              }
+              authorsNames = authorsNames.slice(0, authorsNames.length - 2);
+
               this.tooltipDescription.text(title.textContent);
+              this.tooltipAuthors.text(authorsNames);
               this.tooltipCategories.html(null);
               this.tooltipCategories
                 .selectAll('span')

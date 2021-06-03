@@ -83,6 +83,7 @@
             <span class="block whitespace-nowrap overflow-hidden overflow-ellipsis">
               <span id="categories-selected-count"></span>
               papers
+              <span id="categories-selected-year"></span>
             </span>
             <svg class="absolute text-black h-2 w-full left-0 top-full" x="0px" y="0px" viewBox="0 0 255 255"
                  xml:space="preserve"><polygon class="fill-current" points="0,0 127.5,127.5 255,0"/></svg>
@@ -104,6 +105,7 @@
           <div class="bg-black text-white text-sm rounded py-1 px-4 right-0 bottom-full text-center max-w-xl">
             <a href="#" target="_blank" id="cloud-tooltip-link" class="block whitespace-nowrap underline"></a>
             <span id="cloud-tooltip-description" class="block whitespace-nowrap overflow-hidden overflow-ellipsis font-bold"></span>
+            <span id="cloud-tooltip-authors" class="block whitespace-nowrap overflow-hidden overflow-ellipsis"></span>
             <span id="cloud-tooltip-categories" class="block whitespace-nowrap overflow-hidden overflow-ellipsis"></span>
             <svg class="absolute text-black h-2 w-full left-0 top-full" x="0px" y="0px" viewBox="0 0 255 255"
                  xml:space="preserve"><polygon class="fill-current" points="0,0 127.5,127.5 255,0"/></svg>
@@ -117,19 +119,23 @@
           <div onmouseenter="showElement('#similar-bar-info')" onmouseleave="hideElement('#similar-bar-info')" class="inline-flex items-center justify-center text-center w-0.5 h-0.5 rounded-full shadow-sm hover:bg-gray-200 p-2 bg-gray-300 select-none cursor-help ml-2">
             <span class="text-sm font-medium text-white">i</span>
           </div>
-          <div class="rounded-md border bg-gray-50 absolute w-2/3 right-0 top-6 p-3 z-20 select-none hidden" id="similar-bar-info">
-            <p class="text-sm"> Once you <span class="font-bold">click</span> on a node from the graph above, a bar plot is displayed that shows the weighted proportion of categories related to the selected category. The color palette of the bars corresponds to the one of the graph.</p>
+          <div class="rounded-md border bg-gray-50 absolute w-2/3 right-0 top-6 p-1 z-20 select-none hidden" id="similar-bar-info">
+            <p class="text-sm"> Once you <span class="font-bold">click</span> on a node from the graph above, a bar plot is displayed that shows the weighted proportion of categories related to the selected category. The color palette of the bars corresponds to the one of the graph. You can also <span class="font-bold">click</span> on a bar to change the category.</p>
           </div>
         </div>
         <div id="bar-tooltip" class="absolute w-min pointer-events-none opacity-90 z-30 hidden" style="transform: translate(-50%, -110%)">
           <div class="bg-black text-white text-sm rounded py-1 px-4 right-0 bottom-full text-center max-w-xl">
             <span id="bar-tooltip-id" class="block whitespace-nowrap overflow-hidden overflow-ellipsis text-glow"></span>
             <span id="bar-tooltip-name" class="block whitespace-nowrap overflow-hidden overflow-ellipsis font-bold"></span>
-            <span id="bar-tooltip-percent" class="block whitespace-nowrap overflow-hidden overflow-ellipsis"></span>
             <span class="block whitespace-nowrap overflow-hidden overflow-ellipsis">
               <span id="bar-tooltip-count"></span>
               papers
             </span>
+            <div class="block whitespace-nowrap overflow-hidden overflow-ellipsis">
+              <span id="bar-tooltip-percent" ></span>
+              <span id="bar-tooltip-category" class = "text-glow"></span>
+            </div> 
+            <span id="bar-tooltip-year" class="block whitespace-nowrap overflow-hidden overflow-ellipsis font-bold"></span>
             <svg id="arrow" class="absolute text-black h-2 w-full left-0 top-full" x="0px" y="0px" viewBox="0 0 255 255"
                  xml:space="preserve"><polygon class="fill-current" points="0,0 127.5,127.5 255,0"/></svg>
           </div>
@@ -141,8 +147,8 @@
           <div onmouseenter="showElement('#published-line-info')" onmouseleave="hideElement('#published-line-info')" class="inline-flex items-center justify-center text-center w-0.5 h-0.5 rounded-full shadow-sm hover:bg-gray-200 p-2 bg-gray-300 select-none cursor-help ml-2">
             <span class="text-sm font-medium text-white">i</span>
           </div>
-          <div class="rounded-md border bg-gray-50 absolute left-0 top-6 w-full p-3 z-20 select-none hidden" id="published-line-info">
-            <p class="text-sm">Once you <span class="font-bold">click</span> on a node from the graph above, a line plot is displayed that shows the proportion of papers published in the selected category per time interval. </p>
+          <div class="rounded-md border bg-gray-50 absolute left-0 top-4 w-full p-0 z-20 select-none hidden" id="published-line-info">
+            <p class="text-sm">Once you <span class="font-bold">click</span> on a node from the graph above, a line plot is displayed that shows the proportion of papers published in the selected category per time interval. If a year is <span class="font-bold">selected</span>, the previous year's line plot is displayed as well. </p>
           </div>
         </div>
       </div>
@@ -159,21 +165,32 @@
           </svg>
         <span id="keywords-placeholder" class="absolute left-1/2 top-1/2 text-lg text-gray-500 select-none hidden" style="transform: translate(-50%, -50%)">Not enough data</span>
         <div id="keywords" class="w-full h-full"></div>
-        <div id="keywords-tooltip" class="absolute w-min pointer-events-none opacity-90 z-30 hidden" style="transform: translate(-50%, -155%)">
+        <div id="keywords-tooltip" class="absolute w-min pointer-events-none opacity-90 z-30 hidden" style="transform: translate(-50%, -120%)">
           <div class="bg-black text-white text-sm rounded py-1 px-4 right-0 bottom-full text-center max-w-xl">
-            <span class="block whitespace-nowrap overflow-hidden overflow-ellipsis text-glow">
-              Category:
-              <span id="keywords-tooltip-category"></span>
-            </span>
-            <span  class="block whitespace-nowrap overflow-hidden overflow-ellipsis font-bold">
-              Year: 
-              <span id="keywords-tooltip-year"></span>
-            </span>
-            <!-- <span id="bar-tooltip-percent" class="block whitespace-nowrap overflow-hidden overflow-ellipsis"></span> -->
             <span class="block whitespace-nowrap overflow-hidden overflow-ellipsis">
               <span id="keywords-tooltip-count"></span>
               papers
             </span>
+            <span class="block whitespace-nowrap overflow-hidden overflow-ellipsis">
+              for 
+              <span id="keywords-tooltip-category" class="text-glow"></span> 
+              <span id="keywords-tooltip-year"></span>
+            </span>
+            <span class="block whitespace-nowrap overflow-hidden overflow-ellipsis"> Principal categories: </span>
+            <span class="block whitespace-nowrap overflow-hidden overflow-ellipsis">
+              <span id="keywords-tooltip-category1" class="text-glow"></span>
+              <span id="keywords-tooltip-count1"></span>
+            </span>
+            <span class="block whitespace-nowrap overflow-hidden overflow-ellipsis">
+              <span id="keywords-tooltip-category2" class="text-glow"></span>
+              <span id="keywords-tooltip-count2"></span>
+            </span>
+            <span class="block whitespace-nowrap overflow-hidden overflow-ellipsis">
+              <span id="keywords-tooltip-category3" class="text-glow"></span>
+              <span id="keywords-tooltip-count3"></span>
+            </span>  
+           
+            <!-- <span id="bar-tooltip-percent" class="block whitespace-nowrap overflow-hidden overflow-ellipsis"></span> -->
             <svg class="absolute text-black h-2 w-full left-0 top-full" x="0px" y="0px" viewBox="0 0 255 255"
                  xml:space="preserve"><polygon class="fill-current" points="0,0 127.5,127.5 255,0"/></svg>
           </div>

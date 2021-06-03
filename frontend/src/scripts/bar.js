@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { color, heightChart, margin, widthChart, getCategoryIndexAndLabel } from './common';
+import { ALL, color, heightChart, margin, widthChart, getCategoryIndexAndLabel } from './common';
 
 export const SIMILARITY_BAR_N = 5;
 
@@ -143,9 +143,12 @@ export class BarPlot {
       d3.select('#bar-tooltip-id').text(hoveredBar && hoveredBar.id).style('color', hoveredBar && color(hoveredBar));
       d3.select('#bar-tooltip-name').text(hoveredBar &&
           (this.categoriesNames[hoveredBar.id] || getCategoryIndexAndLabel(hoveredBar.id).label));
-      d3.select('#bar-tooltip-percent').text(hoveredBar &&
-            (hoveredBar.weightRatio * hundred).toFixed(2) + '%');
       d3.select('#bar-tooltip-count').text(hoveredBar && this.categoriesCounts[hoveredBar.id].toLocaleString());
+      d3.select('#bar-tooltip-percent').text(hoveredBar &&
+           ('(' + (hoveredBar.weightRatio * hundred).toFixed(2) + '% of '));
+      d3.select('#bar-tooltip-category').text(hoveredBar &&
+            (this.graph.selectedCategory + ')')).style('color', hoveredBar && color({ id: this.graph.selectedCategory }));
+      d3.select('#bar-tooltip-year').text(hoveredBar && (this.graph.year === ALL) ? 'All time period' : ('Year ' + this.graph.year));
 
       tooltip.classed('hidden', !hoveredBar);
     };

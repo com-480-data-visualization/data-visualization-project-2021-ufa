@@ -109,6 +109,7 @@ export class Graph {
       d3.select('#categories-selected-field').text(hoveredNode &&
         (this.categoriesNames[hoveredNode.id] || getCategoryIndexAndLabel(hoveredNode.id).label));
       d3.select('#categories-selected-count').text(hoveredNode && this.categoriesCounts[this.year][hoveredNode.id].toLocaleString());
+      d3.select('#categories-selected-year').text(hoveredNode && ('(' + ((this.year === ALL) ? ('All time period') : ('year ' + this.year)) + ')'));
 
       tooltip.classed('hidden', !hoveredNode);
     };

@@ -54,6 +54,22 @@ export class Keywords {
     const yearData = keywordsData[this.year];
     const data = yearData && yearData[this.category];
     let shown;
+
+    const topCategoriesMatchForKeyword = (keyword, sizeTop = 1) => {
+      let topCategories = new Array();
+
+      Object.entries(yearData).filter(t => t[0] !== ALL).map(([category, data]) =>
+        data.keywords.forEach(([thatKeyword, count]) => {
+          if (keyword === thatKeyword) {
+            topCategories.push({ category: category, count: count });
+          }
+        }));
+
+      return topCategories.sort((cat1, cat2) => cat2.count - cat1.count).slice(0, sizeTop);
+    };
+
+
+
     if (data && data.keywords.length) {
       const keywordsData = data.keywords.slice(0, 50); // Looks good on most screens
       // eslint-disable-next-line no-unused-vars
@@ -61,19 +77,6 @@ export class Keywords {
       const counts = keywordsData.map(array => array[1]);
       // eslint-disable-next-line no-unused-vars
       const minCount = Math.min(...counts), maxCount = Math.max(...counts);
-
-      const bestCategoryMatchForKeyword = keyword => {
-        let max = 0;
-        let bestCategory = null;
-        Object.entries(yearData).filter(t => t[0] !== ALL).map(([category, data]) =>
-          data.keywords.forEach(([thatKeyword, count]) => {
-            if (keyword === thatKeyword && count > max) {
-              max = count;
-              bestCategory = category;
-            }
-          }));
-        return bestCategory;
-      };
 
       const draw = words => {
         const svg = this.container.append('svg')
@@ -97,7 +100,7 @@ export class Keywords {
           .attr('transform', d => 'translate(' + [d.x, d.y] + ')')
           .classed('cursor-pointer', true).classed('select-none', true)
           .attr('fill', d => {
-            const match = bestCategoryMatchForKeyword(d.text);
+            const match = topCategoriesMatchForKeyword(d.text)[0].category;
             // Due to the `ALL` selector, this can happen. In this case fall back to the default color
             return color({ id: match !== null ? match : '' });
           })
@@ -165,9 +168,22 @@ export class Keywords {
       }
 
       //d3.select('#keywords-tooltip-id').text(hoveredBar && hoveredBar.id).style('color', hoveredBar && color(hoveredBar));
-      d3.select('#keywords-tooltip-category').text(hoveredWord && this.category).style('color', hoveredWord && color({ id: this.category }));
-      d3.select('#keywords-tooltip-year').text(hoveredWord && this.year);
       d3.select('#keywords-tooltip-count').text(hoveredWord && count);
+      d3.select('#keywords-tooltip-category').text(hoveredWord && (this.category + ((this.category === ALL) ? (' categories') : (''))))
+        .style('color', hoveredWord && color({ id: this.category }));
+      d3.select('#keywords-tooltip-year').text(hoveredWord && ('(' + ((this.year === ALL) ? ('All time period') : ('year ' + this.year)) + ')'));
+
+      let top3;
+      if (hoveredWord) {
+        top3 = topCategoriesMatchForKeyword(hoveredWord.text, 3);
+      }
+      if (top3)
+        for (let i = 0; i < top3.length; i++) {
+          const categoryElementId = '#keywords-tooltip-category' + (i + 1);
+          const countElementId = '#keywords-tooltip-count' + (i + 1);
+          d3.select(categoryElementId).text(hoveredWord && (top3[i].category)).style('color', hoveredWord && color({ id: top3[i].category }));
+          d3.select(countElementId).text(hoveredWord && ('(' + top3[i].count + ' papers)'));
+        }
 
       tooltip.classed('hidden', !hoveredWord);
     };
