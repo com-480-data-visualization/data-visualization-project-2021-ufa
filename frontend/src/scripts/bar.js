@@ -95,7 +95,8 @@ export class BarPlot {
       .attr('fill', color)
       // no bar at the beginning thus:
       .attr('height', () => heightChart - this.y(0)) // always equal to 0
-      .attr('y', () =>  this.y(0));
+      .attr('y', () =>  this.y(0))
+      .attr('class', d => d3.select('#catGraph-' + d.id).empty() ? 'cursor-default' : 'cursor-pointer');
 
     const hundred = 100;
 
@@ -126,6 +127,13 @@ export class BarPlot {
       .on('mouseout', () => {
         hoveredBar = null;
         updateTooltip();
+      }).on('click', (event, d) => {
+        const selectedBar = d3.select('#catGraph-' + d.id);
+        if (!selectedBar.empty()) {
+          selectedBar.on('click')(event, d);
+          hoveredBar = null;
+          updateTooltip();
+        }
       });
 
     const updateTooltip = () => {

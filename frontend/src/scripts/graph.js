@@ -210,7 +210,8 @@ export class Graph {
 
       gNodes
         .attr('cx', d => clampX(Math.max(0, Math.min(this.width, d.x))))
-        .attr('cy', d => clampY(Math.max(0, Math.min(this.height, d.y))));
+        .attr('cy', d => clampY(Math.max(0, Math.min(this.height, d.y))))
+        .attr('id', d => 'catGraph-' + d.id);
 
       const groups = {};
       nodes.forEach(node => {
