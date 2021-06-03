@@ -132,6 +132,9 @@ Generally speaking, we will make use of the introductory Javascript and D3 lectu
 
 **80% of the final grade**
 
+**[2 minutes presentation video](https://youtu.be/vvnBr5DZ8qM)**
+
+Process book: [`report/process_book.pdf`](report/process_book.pdf)
 
 ## Late policy
 
