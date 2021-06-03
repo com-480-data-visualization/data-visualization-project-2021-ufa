@@ -138,12 +138,12 @@ export class Graph {
         items.forEach((item, i) => (currValues.push({ date: sameYearDate(date[i], this.year), value: item })));
         dataLine.push({ 'time': this.year, 'values': currValues });
 
-        if (this.year !== ALL) {
-          items = this.paperCounts[category]['mean']['count'];
-          date = this.paperCounts[category]['mean']['date'];
+        if (this.year !== ALL && (this.year - 1) in this.paperCounts[category]) {
+          items = this.paperCounts[category][this.year - 1]['count'];
+          date = this.paperCounts[category][this.year - 1]['date'];
           currValues = [];
-          items.forEach((item, i) => (currValues.push({ date: new Date(2000, date[i], 0), value: item })));
-          dataLine.push({ 'time': 'mean', 'values': currValues });
+          items.forEach((item, i) => (currValues.push({ date: sameYearDate(date[i], this.year), value: item })));
+          dataLine.push({ 'time': 'prevYear', 'values': currValues });
         }
       }
       const weightSum = connectedWeights.map(({ weight }) => weight).reduce((a, b) => a + b, 0);
@@ -157,7 +157,7 @@ export class Graph {
       gLinks.classed('hidden', category ? d => d.source.id !== category && d.target.id !== category : false);
 
       this.barPlot.setData(connectedWeightRatios, this.categoriesNames, this.categoriesCounts[this.year]);
-      this.linePlot.setData(dataLine, category ? color({ id: category }) : '');
+      this.linePlot.setData(dataLine, category ? color({ id: category }) : '', this.year);
 
       this.cloud.update();
       this.keywords.setCategory(this.selectedCategory ? this.selectedCategory : ALL);

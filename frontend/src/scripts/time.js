@@ -15,11 +15,13 @@ export class LinePlot {
   constructor() {
     this.dataLine = [];
     this.lineColor = '';
+    this.year = '';
   }
 
-  setData(dataLine, lineColor) {
+  setData(dataLine, lineColor, year) {
     this.dataLine = dataLine;
     this.lineColor = lineColor;
+    this.year = year;
     this.update();
   }
 
@@ -109,18 +111,18 @@ export class LinePlot {
           .datum(this.dataLine[1])
           .append('path')
           .attr('fill', 'none')
-          .attr('stroke', 'gray')
+          .attr('stroke', '#bab0ab')
           .attr('stroke-width', 1.5)
           .attr('d', d => line(d['values']))
-          .attr('id', 'meanLine');
+          .attr('id', 'prevYearLine');
 
         this.svg.append('text')
           .attr('x', margin.left + widthChart - 5) // The '5' is just an extra margin
           .attr('y', y(this.dataLine[1].values[this.dataLine[1].values.length - 1].value) + margin.top)
           .style('font-size', '8px')
           .style('text-anchor', 'end')
-          .attr('fill', 'gray')
-          .text('mean');
+          .attr('fill', '#bab0ab')
+          .text(this.year - 1);
       }
 
       const totalLength = mainPath.node().getTotalLength();

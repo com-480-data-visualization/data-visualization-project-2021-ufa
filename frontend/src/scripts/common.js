@@ -65,8 +65,8 @@ export const heightChart = 200 - margin.top - margin.bottom;
 export const categoriesColors = d3.schemeTableau10;
 
 export const color = d => {
-  const { index } = getCategoryIndexAndLabel(d.id);
-  return categoriesColors[index];
+  const { index, label } = getCategoryIndexAndLabel(d.id);
+  return label === 'Other' ? 'gray' : categoriesColors[index];
 };
 
 export const ALL = 'all';
