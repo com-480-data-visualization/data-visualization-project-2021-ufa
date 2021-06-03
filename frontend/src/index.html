@@ -7,35 +7,38 @@
 </head>
 <body style="visibility: hidden">
 
-  <!-- TO DO: remove hidden in the end -->
-  <div id="modal" class="fixed z-30 inset-0 overflow-y-auto hidden">
+  <div id="modal" class="fixed z-50 inset-0 overflow-y-auto">
     <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
 
-      <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"
+      <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" style="backdrop-filter: blur(4px);"
            onclick="hideElement('#modal')"></div>
       <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
       <div
           class="rounded-md border bg-gray-50 inline-block text-left overflow-hidden transform sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-        <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        <div class="px-8 pt-5 pb-4 sm:py-6 sm:pb-4">
           <div class="sm:flex sm:items-start">
-            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+            <div class="mt-3 text-center sm:mt-0 sm:text-left">
               <h3 class="text-center text-lg leading-6 font-semibold text-gray-900 pb-1" id="modal-title">
-                arXiv dataset in graphs
+                arXiv data visualization
               </h3>
               <div class="mt-2">
-                <p class="text-sm">
-                  This is a tool that allows you to visualize through interactive graphs the scientific publications in the
-                  <a class="font-bold text-green-500 underline" href="https://www.kaggle.com/Cornell-University/arxiv">arXiv dataset</a>
-                  and it is not endorsed by arXiv.
+                <p class="text-sm text-justify">
+                  This tool provides interactive plots to give an insight of the content uploaded on the open scientific platform <a class="font-bold text-green-500 underline" href="https://arxiv.org/" target="_blank">arxiv.org</a>.
+                  Hover the information icon for more details about each visualization.
+                  <br><br>
+                  The data can be found <a class="font-bold text-green-500 underline" href="https://www.kaggle.com/Cornell-University/arxiv" target="_blank">on Kaggle</a> and the source code of this website is available <a class="font-bold text-green-500 underline" href="https://github.com/com-480-data-visualization/data-visualization-project-2021-ufa" target="_blank">on GitHub</a>.
+                  <br><br>
+                  It was designed as part of a project for the EPFL course <a class="font-bold text-green-500 underline" href="https://edu.epfl.ch/coursebook/en/data-visualization-COM-480" target="_blank">Data Visualization</a> in spring 2021 by Florian Cassayre, Utku Görkem Ertürk and Adina-Maria Ciubotaru. It is not endorsed by arXiv.
+                  We recommend viewing the website from a computer.
                 </p>
               </div>
             </div>
           </div>
         </div>
-        <div class="px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+        <div class="px-8 pb-4 sm:px-8 sm:flex sm:flex-row-reverse">
           <button type="button" onclick="hideElement('#modal')" class="bg-gray-50 mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-white  sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-            Start
+            Begin
           </button>
         </div>
       </div>
@@ -56,7 +59,7 @@
       </div>
       <div class="col-span-1 row-span-1 content-left relative">
         <div class="rounded-md border bg-gray-50 absolute left-1 top-8 w-5/6 p-3 z-20 select-none hidden" id="slider-info">
-        <p class="text-sm">The slider allows you to select a period of time in which papers were published on arXiv and this is reflected in the visualizations below.</p>
+        <p class="text-sm">The slider allows you to restrict the papers to the ones uploaded during a specific a time period. This affects all the visualizations below.</p>
         </div>
         <button type="button" onclick="showElement('#modal')" class="inline-flex items-center justify-center text-center fixed top-2 right-2 w-1.5 h-1.5 rounded-full shadow-sm hover:bg-gray-400 p-4 bg-gray-500">
           <span class="text-lg font-medium text-white">?</span>
@@ -69,7 +72,7 @@
             <span class="text-xs font-medium text-white">i</span>
           </div>
             <div class="rounded-md border bg-gray-50 absolute -right-full top-6 w-full p-3 z-20 select-none hidden" id="categories-graph-info">
-              <p class="text-sm">This is a weighted graph of all categories of papers in the arXiv database. The edges are proportional to the number of papers having the two categories at the same time. When you <span class="font-bold">click</span> a node you can see the adjacent categories and additional statistics below.</p>
+              <p class="text-sm">This weighted graph represents all the categories available on arXiv. The edges are proportional to the number of papers having the two categories at the same time. <span class="font-bold">Click</span> on a node to brush the data on the other plots.</p>
             </div>
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2 cursor-pointer invisible" fill="black" viewBox="0 0 24 24" id="categories-graph-reset">
               <title>Unselect category</title>
@@ -98,7 +101,7 @@
             <span class="text-sm font-medium text-white">i</span>
           </div>
           <div class="rounded-md border bg-gray-50 absolute -right-full top-6 p-3 z-20 select-none hidden" id="papers-cloud-info">
-            <p class="text-sm">Each point represents a paper which you can <span class="font-bold">click</span> on to reveal its name and categories. The cloud was built using PCA on the title/abstract.</p>
+            <p class="text-sm">This cloud represents a random subset of papers, where each point corresponds to an individual paper. The positions are determined from the content of the abstract. <span class="font-bold">Click</span> on a point to reveal more information. <span class="font-bold">Pan</span> and <span class="font-bold">zoom</span> to navigate through the data.</p>
           </div>
         </div>
         <div id="cloud-tooltip" class="absolute w-min left-1/2 top-1/2 opacity-90 z-30 hidden" style="transform: translate(-50%, -100%)">
@@ -119,8 +122,8 @@
           <div onmouseenter="showElement('#similar-bar-info')" onmouseleave="hideElement('#similar-bar-info')" class="inline-flex items-center justify-center text-center w-0.5 h-0.5 rounded-full shadow-sm hover:bg-gray-200 p-2 bg-gray-300 select-none cursor-help ml-2">
             <span class="text-sm font-medium text-white">i</span>
           </div>
-          <div class="rounded-md border bg-gray-50 absolute w-2/3 right-0 top-6 p-1 z-20 select-none hidden" id="similar-bar-info">
-            <p class="text-sm"> Once you <span class="font-bold">click</span> on a node from the graph above, a bar plot is displayed that shows the weighted proportion of categories related to the selected category. The color palette of the bars corresponds to the one of the graph. You can also <span class="font-bold">click</span> on a bar to change the category.</p>
+          <div class="rounded-md border bg-gray-50 absolute w-2/3 right-0 top-6 p-2 z-20 select-none hidden" id="similar-bar-info">
+            <p class="text-sm"><span class="font-bold">Click</span> a node on the graph to reveal the distribution of similar categories. You can also <span class="font-bold">click</span> on a bar to change the selected category.</p>
           </div>
         </div>
         <div id="bar-tooltip" class="absolute w-min pointer-events-none opacity-90 z-30 hidden" style="transform: translate(-50%, -110%)">
@@ -147,8 +150,8 @@
           <div onmouseenter="showElement('#published-line-info')" onmouseleave="hideElement('#published-line-info')" class="inline-flex items-center justify-center text-center w-0.5 h-0.5 rounded-full shadow-sm hover:bg-gray-200 p-2 bg-gray-300 select-none cursor-help ml-2">
             <span class="text-sm font-medium text-white">i</span>
           </div>
-          <div class="rounded-md border bg-gray-50 absolute left-0 top-4 w-full p-0 z-20 select-none hidden" id="published-line-info">
-            <p class="text-sm">Once you <span class="font-bold">click</span> on a node from the graph above, a line plot is displayed that shows the proportion of papers published in the selected category per time interval. If a year is <span class="font-bold">selected</span>, the previous year's line plot is displayed as well. </p>
+          <div class="rounded-md border bg-gray-50 absolute left-0 top-4 w-full p-2 z-20 select-none hidden" id="published-line-info">
+            <p class="text-sm"><span class="font-bold">Click</span> a node on the graph to reveal the upload rate per time interval. If a year is <span class="font-bold">selected</span>, the data for the previous year is displayed as well for comparison.</p>
           </div>
         </div>
       </div>
@@ -157,7 +160,7 @@
             <span class="text-sm font-medium text-white">i</span>
           </div>
           <div class="rounded-md border bg-gray-50 absolute right-10 top-5 w-2/3 p-3 z-20 select-none hidden" id="keywords-info">
-            <p class="text-sm">This is a cloud of the most used keywords in all the papers' abstracts. It can be filtered by selecting a time period in the slider and a category in the graph. By <span class="font-bold">clicking</span> on a keyword the corresponding papers are highlighted in the cloud above.</p>
+            <p class="text-sm">This is a cloud of the most used keywords in all the papers' titles. It can be filtered by selecting a time period in the slider and a category in the graph. By <span class="font-bold">clicking</span> on a keyword the corresponding papers are highlighted in the cloud above.</p>
           </div>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2 cursor-pointer absolute top-0 right-3 invisible" fill="black" viewBox="0 0 24 24" id="keywords-reset">
             <title>Unselect keyword</title>

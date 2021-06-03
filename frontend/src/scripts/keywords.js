@@ -56,7 +56,7 @@ export class Keywords {
     let shown;
 
     const topCategoriesMatchForKeyword = (keyword, sizeTop = 1) => {
-      let topCategories = new Array();
+      let topCategories = [];
 
       Object.entries(yearData).filter(t => t[0] !== ALL).map(([category, data]) =>
         data.keywords.forEach(([thatKeyword, count]) => {
@@ -100,15 +100,15 @@ export class Keywords {
           .attr('transform', d => 'translate(' + [d.x, d.y] + ')')
           .classed('cursor-pointer', true).classed('select-none', true)
           .attr('fill', d => {
-            const match = topCategoriesMatchForKeyword(d.text)[0].category;
+            const match = topCategoriesMatchForKeyword(d.text)[0];
             // Due to the `ALL` selector, this can happen. In this case fall back to the default color
-            return color({ id: match !== null ? match : '' });
+            return color({ id: match != null ? match.category : '' });
           })
           .text(d => d.text)
           .classed('opacity-20', d => this.selected !== null && d.text !== this.selected)
           .on('click', (e, d) => {
             e.stopPropagation();
-            this.selected = d.text;
+            this.selected = this.selected !== d.text ? d.text : null;
             this.update();
             this.cloud.update();
           });
@@ -125,7 +125,7 @@ export class Keywords {
         .rotate(false)
         .font('Poppins')
         .fontSize(d => d.size)
-        .random(seedrandom(1))
+        .random(seedrandom(this.category))
         .on('end', draw);
 
       layout.start();
